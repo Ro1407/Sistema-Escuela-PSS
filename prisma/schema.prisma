@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Padre {
+  id                String   @id @default(uuid())
+  usuario           String   @unique
+  password          String
+  nombre            String
+  apellido          String
+  direccion         String
+  numeroTelefono    String
+  correoElectronico String   @unique
+  hijos             Alumno[]
+}
+
+model Alumno {
+  id                String   @id @default(uuid())
+  usuario           String   @unique
+  password          String
+  nombre            String
+  apellido          String
+  fechaNacimiento   DateTime
+  curso             String
+  numeroMatricula   String   @unique
+  direccion         String
+  telefono          String
+  correoElectronico String   @unique
+  padres            Padre[]
+  materias          Materia[]
+}
+
+model Docente {
+  id                String   @id @default(uuid())
+  usuario           String   @unique
+  password          String
+  nombre            String
+  apellido          String
+  direccion         String
+  matricula         String   @unique
+  numeroTelefono    String
+  correoElectronico String   @unique
+  materiasDadas     Materia[]
+}
+
+model Administrativo {
+  id                String @id @default(uuid())
+  usuario           String   @unique
+  password          String
+  nombre            String
+  apellido          String
+  direccion         String
+  numeroTelefono    String
+  correoElectronico String @unique
+}
+
+model Materia {
+  id        String   @id @default(uuid())
+  nombre    String
+  docente   Docente  @relation(fields: [docenteId], references: [id])
+  docenteId String
+  alumnos   Alumno[]
+}
