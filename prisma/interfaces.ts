@@ -27,6 +27,8 @@ export interface Alumno {
 
 export interface Docente {
     id: string;
+    usuario: string;
+    password: string;
     nombre: string;
     apellido: string;
     direccion: string;
@@ -37,6 +39,8 @@ export interface Docente {
 
 export interface Administrativo {
     id: string;
+    usuario: string;
+    password: string;
     nombre: string;
     apellido: string;
     direccion: string;
