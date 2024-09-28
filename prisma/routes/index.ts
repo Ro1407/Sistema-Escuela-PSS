@@ -13,4 +13,8 @@ router.use('/docentes', docenteRoutes)
 router.use('/administrativos', administrativoRoutes)
 router.use('/materias', materiaRoutes)
 
+router.get('/hw', (req, res) => {
+    res.send('Hello World!')
+})
+
 export default router
