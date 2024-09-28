@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle } from "lucide-react";
 import { Metadata } from "next";
 import { useState } from "react";
 import { useFormState } from "react-dom";
@@ -59,27 +59,27 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
   return (
     <form /*action={formAction}*/ className="flex flex-col space-y-8 m-6">
       <div className="flex align-middle">
-        <Label className="mr-2 mt-2 w-40" htmlFor="name">Nombre y apellido:</Label>
+        <Label className="mr-2 mt-2 w-44" htmlFor="name">Nombre y apellido: *</Label>
         <Input id="name" required />
       </div>
       <div className="flex">
-        <Label className="mr-2 mt-2 w-40" htmlFor="dni">DNI:</Label>
+        <Label className="mr-2 mt-2 w-44" htmlFor="dni">DNI: *</Label>
         <Input id="dni" required type="number" />
       </div>
       <div className="flex">
-        <Label className="mr-2 mt-2 w-40" htmlFor="address">Dirección:</Label>
+        <Label className="mr-2 mt-2 w-44" htmlFor="address">Dirección: *</Label>
         <Input id="address" required />
       </div>
       <div className="flex">
-        <Label className="mr-2 mt-2 w-40" htmlFor="phone">Num. Teléfono:</Label>
+        <Label className="mr-2 mt-2 w-44" htmlFor="phone">Num. Teléfono: *</Label>
         <Input id="phone" type="tel" required />
       </div>
       <div className="flex">
-        <Label className="mr-2 mt-2 w-40" htmlFor="email">Correo Electrónico:</Label>
+        <Label className="mr-2 mt-2 w-44" htmlFor="email">Correo Electrónico: *</Label>
         <Input id="email" type="email" required />
       </div>
       <div className="flex">
-        <Label className="mr-2 mt-2 w-40" htmlFor="userType">Tipo de Usuario:</Label>
+        <Label className="mr-2 mt-2 w-44" htmlFor="userType">Tipo de Usuario: *</Label>
         <Select name="userType" required onValueChange={handleUserChange} value={formData.user}>
           <SelectTrigger id="userType" className="w-full">
             <SelectValue placeholder="Tipo Usuario" />
@@ -97,7 +97,7 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
         <div className="mt-8">
           <div className="flex flex-col md:flex-row md:space-x-6 justify-evenly">
             <div className="flex gap-6 align-top mb-6 md:mb-0">
-              <Label className="text-lg font-semibold">Curso/s</Label>
+              <Label className="text-lg font-semibold">Curso/s *:</Label>
               <div className="flex flex-col space-y-2 border border-gray-600 rounded p-4 pr-5">
                 {['Curso 1', 'Curso 2', 'Curso 3'].map((curso, index) => (
                   <div key={index} className="flex items-center space-x-2">
@@ -109,11 +109,11 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
             </div>
             <div className="space-y-6">
               <div className="flex">
-                <Label htmlFor="matricula" className="mr-4 mt-2 w-30">Matrícula:</Label>
+                <Label htmlFor="matricula" className="mr-4 mt-2 w-36">Matrícula: *</Label>
                 <Input id="matricula" placeholder="Ingresar la matrícula" />
               </div>
               <div className="flex">
-                <Label className="mr-4 mt-2 w-30">Materia/s:</Label>
+                <Label className="mr-4 mt-2 w-36">Materia/s:</Label>
                 <div className="flex flex-col space-y-2">
                   {materias.map((materia, index) => (
                     <div key={index} className="flex items-center space-x-2">
@@ -145,7 +145,7 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
         <div className="mt-8 space-y-6">
           <div className="flex w-full space-x-8 space-y-4 justify-evenly">
             <div className="flex gap-6 align-top">
-              <Label htmlFor="curso" className="text-lg font-semibold">Curso</Label>
+              <Label htmlFor="curso" className="text-lg font-semibold">Curso *</Label>
               <RadioGroup onValueChange={handleCursoChange} className="flex flex-col space-y-1 border border-gray-600 rounded p-4 pr-5">
                 {['curso1', 'curso2', 'curso3'].map((curso) => (
                   <div key={curso} className="flex items-center space-x-2">
@@ -157,7 +157,7 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
             </div>
             <div className="flex flex-col space-y-2">
               <div className="flex">
-                <Label htmlFor="padreTutor" className="mr-2 mt-2 w-40">Padre/Tutor:</Label>
+                <Label htmlFor="padreTutor" className="mr-2 mt-2 w-40">Padre/Tutor: *</Label>
                 <Input
                   id="padreTutor"
                   name="padreTutor"
@@ -165,7 +165,7 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
                 />
               </div>
               <div className="flex">
-                <Label htmlFor="matricula" className="mr-2 mt-2 w-40">Matrícula:</Label>
+                <Label htmlFor="matricula" className="mr-2 mt-2 w-40">Matrícula: *</Label>
                 <Input
                   id="matricula"
                   name="matricula"
@@ -204,8 +204,11 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
         </div>
       )
       }
-
-      <Button type="submit" className="w-60 ml-auto mt-6">Crear</Button>
+      
+      <div className="flex align-center">
+        <p >(*) Campos OBLIGATORIOS</p>
+        <Button type="submit" className="w-60 ml-auto">Crear</Button>
+      </div>
 
       {/*
       {state?.message && (
