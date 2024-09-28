@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import HijosDropdown from "@/components/inicio/padre/drop-down";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,24 +13,23 @@ const metadata: Metadata = {
 }
 
 export default async function InicioPadrePage() {
-  let nombre = "Nombre del padre"
   return (
     <>
-       <InicioPadre nombre={nombre} />
+      <InicioPadre/>
     </>
   );
 }
 
-function InicioPadre({ nombre }: { nombre: string }) {
+function InicioPadre() {
   const fechaActual = formatearFecha(new Date())
   return (
     <div className="h-screen flex flex-col p-5">
       <div className = "flex flex-row justify-between">
         <div className = "flex flex-col items-center">
-          <h2 className="text-3xl font-semibold">Titulo Página</h2>
+          <h2 className="text-3xl font-semibold">Título Página</h2>
           <h2 className="text-md">{fechaActual}</h2>
         </div>
-        <h2 className="text-xl">{nombre}</h2>
+        <HijosDropdown/>
       </div>
       <div className="flex flex-col mt-auto">
         <div className = "flex flex-row justify-between">
