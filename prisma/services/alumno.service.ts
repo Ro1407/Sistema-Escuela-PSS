@@ -23,6 +23,14 @@ export async function getAlumno(id: string): Promise<Alumno | null> {
     return alumno;
 }
 
+export async function getAllAlumnos(): Promise<Alumno[]> {
+    const alumnos = await prisma.alumno.findMany();
+    return alumnos.map((alumno) => ({
+        ...alumno,
+        fechaNacimiento: stripTime(alumno.fechaNacimiento),
+    }));
+}
+
 export async function updateAlumno(id: string, data: Partial<Omit<Alumno, 'id'>>): Promise<Alumno> {
     const { fechaNacimiento, ...rest } = data;
     return prisma.alumno.update({

@@ -29,6 +29,16 @@ export async function getAlumno(req: Request, res: Response) {
     }
 }
 
+export async function getAllAlumnos(req: Request, res: Response) {
+    try {
+        const alumnos = await alumnoService.getAllAlumnos();
+        res.json(alumnos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving all alumnos' });
+    }
+}
+
 export async function updateAlumno(req: Request, res: Response) {
     try {
         const alumno = await alumnoService.updateAlumno(req.params.id, req.body);
