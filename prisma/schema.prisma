@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Usuario {
+  id       String @id @default(uuid())
+  usuario  String @unique
+  password String
+  rol      Rol
+  padre    Padre?
+  alumno   Alumno?
+  docente  Docente?
+  administrativo Administrativo?
+}
+
+enum Rol {
+  PADRE
+  ALUMNO
+  DOCENTE
+  ADMINISTRATIVO
+}
+
+model Padre {
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
+  nombre            String
+  apellido          String
+  direccion         String
+  numeroTelefono    String
+  correoElectronico String   @unique
+}
+
+model Alumno {
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
+  nombre            String
+  apellido          String
+  fechaNacimiento   DateTime
+  curso             String
+  numeroMatricula   String   @unique
+  direccion         String
+  telefono          String
+  correoElectronico String   @unique
+  materias          Materia[] @relation("AlumnoMateria")
+}
+
+model Docente {
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
+  nombre            String
+  apellido          String
+  direccion         String
+  matricula         String   @unique
+  numeroTelefono    String
+  correoElectronico String   @unique
+  materias          Materia[] @relation("DocenteMateria")
+}
+
+model Administrativo {
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
+  nombre            String
+  apellido          String
+  direccion         String
+  numeroTelefono    String
+  correoElectronico String   @unique
+}
+
+model Materia {
+  id        String   @id @default(uuid())
+  nombre    String
+  docente   Docente  @relation(fields: [docenteId], references: [id], name: "DocenteMateria")
+  docenteId String
+  alumnos   Alumno[] @relation("AlumnoMateria")
+}
