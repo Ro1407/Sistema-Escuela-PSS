@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,22 +8,37 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+model Usuario {
+  id       String @id @default(uuid())
+  usuario  String @unique
+  password String
+  rol      Rol
+  padre    Padre?
+  alumno   Alumno?
+  docente  Docente?
+  administrativo Administrativo?
+}
+
+enum Rol {
+  PADRE
+  ALUMNO
+  DOCENTE
+  ADMINISTRATIVO
+}
+
 model Padre {
-  id                String   @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
   direccion         String
   numeroTelefono    String
   correoElectronico String   @unique
-  hijos             Alumno[]
 }
 
 model Alumno {
-  id                String   @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
   fechaNacimiento   DateTime
@@ -35,38 +47,35 @@ model Alumno {
   direccion         String
   telefono          String
   correoElectronico String   @unique
-  padres            Padre[]
-  materias          Materia[]
+  materias          Materia[] @relation("AlumnoMateria")
 }
 
 model Docente {
-  id                String   @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
   direccion         String
   matricula         String   @unique
   numeroTelefono    String
   correoElectronico String   @unique
-  materiasDadas     Materia[]
+  materias          Materia[] @relation("DocenteMateria")
 }
 
 model Administrativo {
-  id                String @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String   @id @default(uuid()) @unique
+  usuario           Usuario  @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
   direccion         String
   numeroTelefono    String
-  correoElectronico String @unique
+  correoElectronico String   @unique
 }
 
 model Materia {
   id        String   @id @default(uuid())
   nombre    String
-  docente   Docente  @relation(fields: [docenteId], references: [id])
+  docente   Docente  @relation(fields: [docenteId], references: [id], name: "DocenteMateria")
   docenteId String
-  alumnos   Alumno[]
+  alumnos   Alumno[] @relation("AlumnoMateria")
 }
