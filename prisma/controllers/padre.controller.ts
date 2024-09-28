@@ -25,6 +25,16 @@ export async function getPadre(req: Request, res: Response) {
     }
 }
 
+export async function getAllPadres(req: Request, res: Response) {
+    try {
+        const padres = await padreService.getAllPadres();
+        res.json(padres);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving all padres' });
+    }
+}
+
 export async function updatePadre(req: Request, res: Response) {
     try {
         const padre = await padreService.updatePadre(req.params.id, req.body);

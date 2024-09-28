@@ -3,8 +3,9 @@ import * as docenteController from '../controllers/docente.controller'
 
 const router = express.Router()
 
-router.post('/', docenteController.createDocente)
+router.get('/', docenteController.getAllDocentes)
 router.get('/:id', docenteController.getDocente)
+router.post('/', docenteController.createDocente)
 router.put('/:id', docenteController.updateDocente)
 router.delete('/:id', docenteController.deleteDocente)
 

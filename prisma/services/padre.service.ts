@@ -11,6 +11,10 @@ export async function getPadre(id: string): Promise<Padre | null> {
     return prisma.padre.findUnique({ where: { id } })
 }
 
+export async function getAllPadres(): Promise<Padre[]> {
+    return prisma.padre.findMany();
+}
+
 export async function updatePadre(id: string, data: Partial<Omit<Padre, 'id'>>): Promise<Padre> {
     return prisma.padre.update({ where: { id }, data })
 }

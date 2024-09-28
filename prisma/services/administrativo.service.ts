@@ -9,6 +9,10 @@ export async function getAdministrativo(id: string): Promise<Administrativo | nu
     return prisma.administrativo.findUnique({ where: { id } })
 }
 
+export async function getAllAdministrativos(): Promise<Administrativo[]> {
+    return prisma.administrativo.findMany();
+}
+
 export async function updateAdministrativo(id: string, data: Partial<Omit<Administrativo, 'id'>>): Promise<Administrativo> {
     return prisma.administrativo.update({ where: { id }, data })
 }
