@@ -10,7 +10,9 @@ app.use('/api', routes)
 app.use(errorMiddleware)
 
 app.get('/', (req, res) => {
+
     res.send('Hello World!')
+
 })
 
 const PORT = process.env.PORT || 3001
