@@ -2,7 +2,7 @@
 import AdminOptions from "@/components/inicio/admin/AdminOptions";
 import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
-
+import {Alumno} from "@/lib/definitions"
 export const metadata: Metadata = {
   title: 'Administrar',
 }
