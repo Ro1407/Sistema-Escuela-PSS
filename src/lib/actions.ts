@@ -20,11 +20,11 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
     });
 
     if (!user) {
-      return { error: 'User not found', redirectPath: null };
+      return { error: 'El usuario ingresado no está registrado', redirectPath: null };
     }
 
     if (user.password !== password) {
-      return { error: 'Invalid password', redirectPath: null };
+      return { error: 'La contraseña ingresada no se corresponde con el usuario', redirectPath: null };
     }
 
     let redirectPath = '';
@@ -39,7 +39,7 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
     return { error: null, redirectPath };
   } catch (error) {
     console.error('Error validating user:', error);
-    return { error: 'An error occurred during validation', redirectPath: null };
+    return { error: 'Ocurrió un error durante la validación', redirectPath: null };
   } finally {
     await prisma.$disconnect();
   }
