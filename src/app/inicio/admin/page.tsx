@@ -20,12 +20,15 @@ export default function InicioAdmin() {
   const initialState = { errors: null, message: null };
   const [state, dispatch] = useFormState(sendUser, initialState);
 
+  const [materias, setMaterias] = useState([''])
+  const [hijos, setHijos] = useState([''])
   const [formData, setFormData] = useState({
     user: '',
     curso: '',
+    materias: materias,
+    hijos: hijos,
   })
-  const [materias, setMaterias] = useState([''])
-  const [hijos, setHijos] = useState([''])
+  
 
   const handleUserChange = (value: string) => {
     setFormData(prevData => ({ ...prevData, user: value }))
@@ -122,7 +125,7 @@ export default function InicioAdmin() {
                     <div key={index} className="flex items-center space-x-2">
                       <Input
                         id={`materia-${index}`}
-                        name={`materia-${index}`}
+                        name="materia[]"
                         value={materia}
                         onChange={(e) => handleMateriaChange(index, e.target.value)}
                         placeholder={`Materia ${index + 1}`}
@@ -190,7 +193,7 @@ export default function InicioAdmin() {
               <div key={index} className="flex items-center space-x-2">
                 <Input
                   id={`hijo-${index}`}
-                  name={`hijo-${index}`}
+                  name="hijos[]"
                   value={hijo}
                   onChange={(e) => handleHijoChange(index, e.target.value)}
                   placeholder={`Hijo ${index + 1}`}
