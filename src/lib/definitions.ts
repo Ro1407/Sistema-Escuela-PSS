@@ -46,3 +46,16 @@ export interface Materia {
   docenteId: string;
   alumnos?: Alumno[];
 }
+
+export interface Padre {
+  usuario: {
+    usuario: string,
+    password: string
+  }
+  nombre: string;
+  apellido: string;
+  direccion: string;
+  numeroTelefono: string;
+  correoElectronico: string;
+  hijos : string[]
+}

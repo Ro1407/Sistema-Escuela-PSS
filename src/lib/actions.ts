@@ -3,7 +3,8 @@
 import { PrismaClient } from '@prisma/client'
 import { createAlumno } from "../../prisma/services/alumno.service";
 import { State } from "./definitions";
-import { Alumno} from "./definitions"
+import { Alumno, Padre } from "./definitions"
+import { createPadre } from '../../prisma/services/padre.service';
 
 
 export type AuthState = {
@@ -48,54 +49,96 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
     await prisma.$disconnect();
   }
 }
-
 export async function sendUser(prevState : State, formData : FormData) : Promise<State>{
-    const userTy = formData.get('userType')
-    let alumno: Alumno | undefined;
-    //Imprimir por consola los datos recibidos del formulario
-    console.log(formData)
-    console.log(formData.getAll('materia[]'))
-    if(userTy == "alumno"){
-        const date = new Date();
-        const dni = formData.get('dni')?.toString()  || ''
-        alumno = {
-            nombre : getNombre(formData.get('name')?.toString()) || 'null',
-            apellido : getApellido(formData.get('name')?.toString()) || 'null',
-            direccion : formData.get('address')?.toString() || 'null',
-            telefono : formData.get('phone')?.toString() || 'null',
-            correoElectronico : formData.get('email')?.toString() || 'null',
-            curso : formData.get('curso')?.toString() || 'null',
-            numeroMatricula: formData.get('matricula')?.toString() || 'null',
-            fechaNacimiento: date,
-            usuario: {
-                usuario: dni,
-                password: dni
-            },
-            materiasIds: ["89becd5b-e960-4da9-87b5-8497ea5aa4bd"]
-        }
-    }
-
-    if(alumno && await registrarAlumno(alumno))
-    return {
-        message: "Usuario Registrado"
-      }
-    else
-    return {
-        errors: "datos de alumno invalidos / db",
-        message: "Error creando usuario"
-      }
-
+  const userTy = formData.get('userType')
+  let state : State = {errors: "error de formulario", message: "error recuperando formulario"}
+  switch(userTy){
+      case 'alumno' : state = await sendAlumno(formData);
+                      break;
+      case 'padre' : state = await sendPadre(formData);
+                      break;
+  }
+  return state;
 }
 
+async function sendAlumno(formData: FormData) : Promise<State>{
+  let alumno: Alumno | undefined;
+  const date = new Date();
+  const dni = formData.get('dni')?.toString()  || ''
+  alumno = {
+      nombre : getNombre(formData.get('name')?.toString()) || 'null',
+      apellido : getApellido(formData.get('name')?.toString()) || 'null',
+      direccion : formData.get('address')?.toString() || 'null',
+      telefono : formData.get('phone')?.toString() || 'null',
+      correoElectronico : formData.get('email')?.toString() || 'null',
+      curso : formData.get('curso')?.toString() || 'null',
+      numeroMatricula: formData.get('matricula')?.toString() || 'null',
+      fechaNacimiento: date,
+      usuario: {
+          usuario: dni,
+          password: dni
+      },
+      materiasIds: ["89becd5b-e960-4da9-87b5-8497ea5aa4bd"]
+  }
+  
+  if(alumno && await registrarAlumno(alumno))
+  return {
+      message: "Usuario Registrado"
+    }
+  else
+  return {
+      errors: "datos de alumno invalidos / db",
+      message: "Error creando usuario"
+    }
+}
+
+async function sendPadre(formData: FormData) : Promise<State>{
+  let padre: Padre | undefined;
+  const dni = formData.get('dni')?.toString()  || ''
+  padre = {
+      nombre : getNombre(formData.get('name')?.toString()) || 'null',
+      apellido : getApellido(formData.get('name')?.toString()) || 'null',
+      direccion : formData.get('address')?.toString() || 'null',
+      numeroTelefono : formData.get('phone')?.toString() || 'null',
+      correoElectronico : formData.get('email')?.toString() || 'null',
+      usuario: {
+          usuario: dni,
+          password: dni
+      },
+      hijos: formData.getAll('hijos[]').map(hijo => hijo.toString()) //id para identificar a los hijos en la BD
+  }
+  
+  if(padre && await registrarPadre(padre))
+  return {
+      message: "Usuario Registrado"
+    }
+  else
+  return {
+      errors: "datos de alumno invalidos / db",
+      message: "Error creando usuario"
+    }
+}
+
+
 async function registrarAlumno(alumno : Alumno){
-    try{
-        await createAlumno(alumno)
-        return true;
-    }
-    catch (e){
-        console.log(e)
-        return false
-    }
+  try{
+      await createAlumno(alumno)
+      return true;
+  }
+  catch (e){
+      console.log(e)
+      return false
+  }
+}
+async function registrarPadre(padre : Padre){
+  try{
+      await createPadre(padre)
+      return true;
+  }
+  catch (e){
+      console.log(e)
+      return false
+  }
 }
 
 function getNombre(fullName : string | undefined) {
