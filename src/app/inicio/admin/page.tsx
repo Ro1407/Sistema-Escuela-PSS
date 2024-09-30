@@ -29,7 +29,7 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
 
   const handleUserChange = (value: string) => {
     setFormData(prevData => ({ ...prevData, user: value }))
-    if (value !== 'option3') {
+    if (value !== 'docente') {
       setMaterias([''])
     }
   }
@@ -121,6 +121,8 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
                   {materias.map((materia, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <Input
+                        id={`materia-${index}`}
+                        name={`materia-${index}`}
                         value={materia}
                         onChange={(e) => handleMateriaChange(index, e.target.value)}
                         placeholder={`Materia ${index + 1}`}
@@ -187,6 +189,8 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
             {hijos.map((hijo, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <Input
+                  id={`hijo-${index}`}
+                  name={`hijo-${index}`}
                   value={hijo}
                   onChange={(e) => handleHijoChange(index, e.target.value)}
                   placeholder={`Hijo ${index + 1}`}
