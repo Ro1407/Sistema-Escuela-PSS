@@ -15,7 +15,7 @@ const metadata: Metadata = {
   title: 'Inicio Admin',
 }
 
-export default function InicioAdmin({ nombre }: { nombre: string }) {
+export default function InicioAdmin() {
   //Utilizar server action
   //const [state, formAction] = useFormState(registerUser, null)
   const [formData, setFormData] = useState({
