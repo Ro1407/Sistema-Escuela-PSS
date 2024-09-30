@@ -27,13 +27,14 @@ enum Rol {
 }
 
 model Padre {
-  id                String   @id @default(uuid()) @unique
-  usuario           Usuario  @relation(fields: [id], references: [id])
+  id                String    @id @default(uuid()) @unique
+  usuario           Usuario   @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
   direccion         String
   numeroTelefono    String
-  correoElectronico String   @unique
+  correoElectronico String    @unique
+  hijos             Alumno[]  @relation("PadreHijos")
 }
 
 model Alumno {
@@ -42,12 +43,15 @@ model Alumno {
   nombre            String
   apellido          String
   fechaNacimiento   DateTime
-  curso             String
   numeroMatricula   String   @unique
   direccion         String
   telefono          String
   correoElectronico String   @unique
   materias          Materia[] @relation("AlumnoMateria")
+  padre             Padre?   @relation("PadreHijos", fields: [padreId], references: [id])
+  padreId           String? 
+  curso             Curso    @relation(fields: [cursoId], references: [id])
+  cursoId           String
 }
 
 model Docente {
@@ -59,7 +63,9 @@ model Docente {
   matricula         String   @unique
   numeroTelefono    String
   correoElectronico String   @unique
-  materias          Materia[] @relation("DocenteMateria")
+  cursos            Curso[]  @relation("DocenteCurso")
+  materia           Materia?  @relation(fields: [materiaId], references: [id], name: "DocenteMateria")
+  materiaId         String?  
 }
 
 model Administrativo {
@@ -75,7 +81,14 @@ model Administrativo {
 model Materia {
   id        String   @id @default(uuid())
   nombre    String
-  docente   Docente  @relation(fields: [docenteId], references: [id], name: "DocenteMateria")
-  docenteId String
+  docente   Docente @relation("DocenteMateria")
+  cursos    Curso[]  @relation("MateriaCurso")
   alumnos   Alumno[] @relation("AlumnoMateria")
+}
+
+model Curso {
+  id        String   @id @default(uuid())
+  nombre    String
+  materias  Materia[] @relation("MateriaCurso")
+  docentes  Docente[] @relation("DocenteCurso")
 }
