@@ -10,17 +10,28 @@ import {
 } from "@heroicons/react/24/outline";
 import React from "react";
 import { useFormState, useFormStatus } from "react-dom";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 type AuthState = {
   error: string | null;
+  redirectPath: string | null;
 };
 
 const initialState: AuthState = {
   error: null,
+  redirectPath: null,
 };
 
 export default function LoginForm() {
   const [state, dispatch] = useFormState<AuthState, FormData>(validateUser, initialState);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (state.redirectPath && pathname !== state.redirectPath) {
+      window.location.href = state.redirectPath; 
+    }
+  }, [state.redirectPath, pathname]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
