@@ -9,15 +9,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle } from "lucide-react";
 import { Metadata } from "next";
 import { useState } from "react";
-import { useFormState } from "react-dom";
-
+import { useFormState, useFormStatus } from "react-dom";
+import { sendUser } from '@/lib/actions';
 const metadata: Metadata = {
   title: 'Inicio Admin',
 }
 
 export default function InicioAdmin({ nombre }: { nombre: string }) {
   //Utilizar server action
-  //const [state, formAction] = useFormState(registerUser, null)
+  const initialState = { errors: null, message: null };
+  const [state, dispatch] = useFormState(sendUser, initialState);
+
   const [formData, setFormData] = useState({
     user: '',
     curso: '',
@@ -57,26 +59,26 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
   }
 
   return (
-    <form /*action={formAction}*/ className="flex flex-col space-y-8 m-6">
+    <form action={dispatch} className="flex flex-col space-y-8 m-6">
       <div className="flex align-middle">
         <Label className="mr-2 mt-2 w-44" htmlFor="name">Nombre y apellido: *</Label>
-        <Input id="name" required />
+        <Input id="name" name="name" required />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="dni">DNI: *</Label>
-        <Input id="dni" required type="number" />
+        <Input id="dni" name="dni" required type="number" />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="address">Dirección: *</Label>
-        <Input id="address" required />
+        <Input id="address" name="address" required />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="phone">Num. Teléfono: *</Label>
-        <Input id="phone" type="tel" required />
+        <Input id="phone" name="phone" type="tel" required />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="email">Correo Electrónico: *</Label>
-        <Input id="email" type="email" required />
+        <Input id="email" name ="email" required />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="userType">Tipo de Usuario: *</Label>
@@ -93,6 +95,7 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
         </Select>
       </div>
 
+      {/*Seccion condicional según tipo de usuario*/}
       {formData.user === 'docente' && (
         <div className="mt-8">
           <div className="flex flex-col md:flex-row md:space-x-6 justify-evenly">
@@ -146,7 +149,7 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
           <div className="flex w-full space-x-8 space-y-4 justify-evenly">
             <div className="flex gap-6 align-top">
               <Label htmlFor="curso" className="text-lg font-semibold">Curso *</Label>
-              <RadioGroup onValueChange={handleCursoChange} className="flex flex-col space-y-1 border border-gray-600 rounded p-4 pr-5">
+              <RadioGroup name="curso" onValueChange={handleCursoChange} className="flex flex-col space-y-1 border border-gray-600 rounded p-4 pr-5">
                 {['curso1', 'curso2', 'curso3'].map((curso) => (
                   <div key={curso} className="flex items-center space-x-2">
                     <RadioGroupItem value={curso} id={curso} />
@@ -210,13 +213,12 @@ export default function InicioAdmin({ nombre }: { nombre: string }) {
         <Button type="submit" className="w-60 ml-auto">Crear</Button>
       </div>
 
-      {/*
-      {state?.message && (
-        <p className={`mt-4 text-center ${state.success ? 'text-green-600' : 'text-red-600'}`}>
+      {
+      state?.message && (
+        <p className={`mt-4 text-center ${state.errors? 'text-red-600' : 'text-green-600'}`}>
           {state.message}
         </p>
       )}
-      */}
     </form >
 
 

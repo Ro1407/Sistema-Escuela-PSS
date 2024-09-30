@@ -11,7 +11,7 @@ export default function AdminOptions() {
   return (
     <div className="flex flex-col space-y-2 w-full">
       <Link
-        href="/incio/admin"
+        href="/inicio/admin"
         className={clsx(
           "w-full gap-3 rounded-lg px-3 py-2 text-white text-sm",
           pathname === '/inicio/admin' ? 'bg-blue-700 text-white' : 'bg-gray-900'
@@ -20,7 +20,7 @@ export default function AdminOptions() {
         Crear Usuario
       </Link>
       <Link
-        href="/incio/admin/modificar"
+        href="/inicio/admin/modificar"
         className={clsx(
           "w-full gap-3 rounded-lg px-3 py-2 text-white text-sm",
           pathname === '/inicio/admin/modificar' ? 'bg-blue-700 text-white' : 'bg-gray-900'
@@ -28,7 +28,7 @@ export default function AdminOptions() {
         Modificar Usuario
       </Link>
       <Link
-        href="/incio/admin/cursado"
+        href="/inicio/admin/cursado"
         className={clsx(
           "w-full gap-3 rounded-lg px-3 py-2 text-white text-sm",
           pathname === '/inicio/admin/cursado' ? 'bg-blue-700 text-white' : 'bg-gray-900'

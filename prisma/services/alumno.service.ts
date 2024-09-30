@@ -6,7 +6,7 @@ function stripTime(date: Date): Date {
     return new Date(date.toISOString().split('T')[0]);
 }
 
-export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario'> & { usuario: { usuario: string; password: string }, materiasIds: string[] }): Promise<Alumno> {
+export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario' | 'materias'> & { usuario: { usuario: string; password: string }, materiasIds: string[] }): Promise<Alumno> {
     const { fechaNacimiento, materiasIds, ...rest } = data;
 
     return prisma.alumno.create({
