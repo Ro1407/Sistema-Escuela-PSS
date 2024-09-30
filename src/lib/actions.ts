@@ -52,6 +52,9 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
 export async function sendUser(prevState : State, formData : FormData) : Promise<State>{
     const userTy = formData.get('userType')
     let alumno: Alumno | undefined;
+    //Imprimir por consola los datos recibidos del formulario
+    console.log(formData)
+    console.log(formData.getAll('materia[]'))
     if(userTy == "alumno"){
         const date = new Date();
         const dni = formData.get('dni')?.toString()  || ''
