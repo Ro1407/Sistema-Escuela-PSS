@@ -1,6 +1,10 @@
 'use server'
 
 import { PrismaClient } from '@prisma/client'
+import { createAlumno } from "../../prisma/services/alumno.service";
+import { State } from "./definitions";
+import { Alumno} from "./definitions"
+
 
 export type AuthState = {
   error: string | null;
@@ -44,12 +48,6 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
     await prisma.$disconnect();
   }
 }
-'use server'
-
-import { createAlumno } from "../../prisma/services/alumno.service";
-import { State } from "./definitions";
-import { Alumno} from "./definitions"
-
 
 export async function sendUser(prevState : State, formData : FormData) : Promise<State>{
     const userTy = formData.get('userType')
