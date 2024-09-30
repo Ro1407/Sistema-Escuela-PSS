@@ -15,7 +15,7 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
 
   try {
     const user = await prisma.usuario.findUnique({
-      where: { usuario: username },
+      where: { usuario: username.toLocaleLowerCase() },
       include: { padre: true, alumno: true, docente: true, administrativo: true },
     });
 
