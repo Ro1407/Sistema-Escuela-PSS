@@ -1,23 +1,18 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { getUser } from '../../prisma/services/autenticacion.service';
 
 export type AuthState = {
   error: string | null;
   redirectPath: string | null;
 };
 
-const prisma = new PrismaClient()
-
 export async function validateUser(prevState: AuthState, formData: FormData): Promise<AuthState> {
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
 
   try {
-    const user = await prisma.usuario.findUnique({
-      where: { usuario: username.toLocaleLowerCase() },
-      include: { padre: true, alumno: true, docente: true, administrativo: true },
-    });
+    const user = await getUser(username); 
 
     if (!user) {
       return { error: 'El usuario ingresado no está registrado', redirectPath: null };
@@ -40,7 +35,5 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
   } catch (error) {
     console.error('Error validating user:', error);
     return { error: 'Ocurrió un error durante la validación', redirectPath: null };
-  } finally {
-    await prisma.$disconnect();
   }
 }
