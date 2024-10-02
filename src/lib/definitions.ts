@@ -47,6 +47,21 @@ export interface Materia {
   alumnos?: Alumno[];
 }
 
+export interface Docente {
+  usuario: {
+    usuario: string,
+    password: string
+  }
+  nombre: string;
+  apellido: string;
+  direccion: string;
+  matricula: string;
+  numeroTelefono: string;
+  correoElectronico: string;
+  materias : string[]
+  cursos : string[]
+}
+
 export interface Padre {
   usuario: {
     usuario: string,
