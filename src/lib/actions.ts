@@ -2,9 +2,10 @@
 
 import { PrismaClient } from '@prisma/client'
 import { createAlumno } from "../../prisma/services/alumno.service";
-import { State } from "./definitions";
+import { Docente, State } from "./definitions";
 import { Alumno, Padre } from "./definitions"
 import { createPadre } from '../../prisma/services/padre.service';
+import { createDocente } from '../../prisma/services/docente.service';
 
 
 export type AuthState = {
@@ -53,10 +54,15 @@ export async function sendUser(prevState : State, formData : FormData) : Promise
   const userTy = formData.get('userType')
   let state : State = {errors: "error de formulario", message: "error recuperando formulario"}
   switch(userTy){
-      case 'alumno' : state = await sendAlumno(formData);
-                      break;
-      case 'padre' : state = await sendPadre(formData);
-                      break;
+      case 'alumno': 
+        state = await sendAlumno(formData);
+        break;
+      case 'docente': 
+        state = await sendDocente(formData);
+        break;
+      case 'padre': 
+        state = await sendPadre(formData);
+        break;
   }
   return state;
 }
@@ -91,6 +97,44 @@ async function sendAlumno(formData: FormData) : Promise<State>{
       message: "Error creando usuario"
     }
 }
+
+
+async function sendDocente(formData: FormData) : Promise<State>{
+  let docente: Docente | undefined;
+  const dni = formData.get('dni')?.toString()  || ''
+  console.log(formData)
+  const cursos = formData.getAll('cursos[]').map(curso => curso.toString())
+  console.log(cursos)
+  docente = {
+      nombre : getNombre(formData.get('name')?.toString()) || 'null',
+      apellido : getApellido(formData.get('name')?.toString()) || 'null',
+      direccion : formData.get('address')?.toString() || 'null',
+      numeroTelefono : formData.get('phone')?.toString() || 'null',
+      correoElectronico : formData.get('email')?.toString() || 'null',
+      matricula : formData.get('matricula')?.toString() || 'null',
+      materias : formData.getAll('materias[]').map(materia => materia.toString()),
+      cursos : formData.getAll('cursos[]').map(curso => curso.toString()),
+      usuario: {
+          usuario: dni,
+          password: dni
+      }
+  }
+  /*
+  if(docente && await registrarDocente(docente))
+  return {
+      message: "Usuario Registrado"
+    }
+  else
+  return {
+      errors: "datos de docente invalidos / db",
+      message: "Error creando usuario"
+    }
+  */
+  return {
+    message: "Usuario Registrado"
+  }
+}
+
 
 async function sendPadre(formData: FormData) : Promise<State>{
   let padre: Padre | undefined;
@@ -130,6 +174,20 @@ async function registrarAlumno(alumno : Alumno){
       return false
   }
 }
+
+/*
+async function registrarDocente(docente : Docente){
+  try{
+      await createDocente(docente)
+      return true;
+  }
+  catch (e){
+      console.log(e)
+      return false
+  }
+}
+*/
+
 async function registrarPadre(padre : Padre){
   try{
       await createPadre(padre)
