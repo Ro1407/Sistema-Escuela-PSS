@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 const metadata: Metadata = {
   title: 'Inicio Docente',
@@ -41,7 +42,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <h2 className="text-3xl font-semibold">{getTitle()}</h2>
           <h2 className="text-md">{fechaActual}</h2>
         </div>
-        <CursosDropdown />
+        <div className="flex space-x-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <div className="flex items-center space-x-2">
+                  <p>Nombre docente</p>
+                  <ChevronDownIcon className="w-4 h-4" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Button variant="outline" size="sm" className="cursor-pointer border-none w-full">Cerrar Sesión</Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <CursosDropdown />
+        </div>
       </div>
       <main className="flex-1 overflow-auto p-6">
         {children}
