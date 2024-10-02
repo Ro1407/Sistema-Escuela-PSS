@@ -7,6 +7,7 @@ export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { us
         data: {
             nombre: data.nombre,
             apellido: data.apellido,
+            dni: data.dni,
             direccion: data.direccion,
             matricula: data.matricula,
             numeroTelefono: data.numeroTelefono,
@@ -18,23 +19,26 @@ export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { us
                     rol: Rol.DOCENTE
                 }
             },
-            materias: {
-                connect: data.materiasIds.map((id) => ({ id })) 
-            }
+            cursos: {
+                connect: data.materiasIds.map((id) => ({ id: id }))
+            },
+            materia: {
+                connect: { id: data.materiaId }
+            },
         },
         include: {
             usuario: true,
-            materias: true 
+            cursos: true,
+            materia: true,
         }
     });
 }
-
 export async function getDocente(id: string): Promise<Docente | null> {
     return prisma.docente.findUnique({
         where: { id },
         include: {
             usuario: true, 
-            materias: true 
+            materia: true 
         }
     });
 }
@@ -43,7 +47,7 @@ export async function getAllDocentes(): Promise<Docente[]> {
     return prisma.docente.findMany({
         include: {
             usuario: true,
-            materias: true 
+            materia: true 
         }
     });
 }
@@ -71,7 +75,7 @@ export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id'
         data: updateData,
         include: {
             usuario: true, 
-            materias: true
+            materia: true
         }
     });
 }
@@ -81,7 +85,7 @@ export async function deleteDocente(id: string): Promise<Docente> {
         where: { id },
         include: {
             usuario: true,
-            materias: true
+            materia: true
         }
     });
 }

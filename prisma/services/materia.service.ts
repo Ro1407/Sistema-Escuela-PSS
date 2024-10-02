@@ -1,25 +1,20 @@
 import prisma from '../prismaClientInitialization';
 import { Materia } from '../interfaces';
 
-export async function createMateria(data: Omit<Materia, 'id'> & { alumnosIds?: string[] }): Promise<Materia> {
+export async function createMateria(data: Omit<Materia, 'id' | 'docente' | 'cursos'> & { docenteId: string, cursosIds: string[] }): Promise<Materia> {
     return prisma.materia.create({
         data: {
             nombre: data.nombre,
             docente: {
                 connect: { id: data.docenteId }
             },
-            alumnos: data.alumnosIds ? {
-                connect: data.alumnosIds.map(id => ({ id })) 
-            } : undefined
+            cursos: {
+                connect: data.cursosIds.map(id => ({ id }))
+            }
         },
         include: {
-            docente: true,  
-            alumnos: {
-                include: {
-                    usuario: true, 
-                    materias: true
-                }
-            }
+            docente: true,
+            cursos: true
         }
     });
 }
@@ -28,13 +23,8 @@ export async function getMateria(id: string): Promise<Materia | null> {
     return prisma.materia.findUnique({
         where: { id },
         include: {
-            docente: true, 
-            alumnos: {
-                include: {
-                    usuario: true,
-                    materias: true 
-                }
-            }
+            docente: true,
+            cursos: true
         }
     });
 }
@@ -43,19 +33,25 @@ export async function getAllMaterias(): Promise<Materia[]> {
     return prisma.materia.findMany({
         include: {
             docente: true,
-            alumnos: {
-                include: {
-                    usuario: true,
-                    materias: true
-                }
-            }
+            cursos: true
         }
     });
 }
 
-
-export async function updateMateria(id: string, data: Partial<Omit<Materia, 'id'>> & { alumnosIds?: string[] }): Promise<Materia> {
+export async function updateMateria(id: string, data: Partial<Omit<Materia, 'id' | 'docente' | 'cursos'>> & { docenteId?: string, cursosIds?: string[], alumnosIds?: string[] }): Promise<Materia> {
     const updateData: any = { ...data };
+
+    if (data.docenteId) {
+        updateData.docente = {
+            connect: { id: data.docenteId }
+        };
+    }
+
+    if (data.cursosIds) {
+        updateData.cursos = {
+            set: data.cursosIds.map(id => ({ id }))
+        };
+    }
 
     if (data.alumnosIds) {
         updateData.alumnos = {
@@ -67,13 +63,8 @@ export async function updateMateria(id: string, data: Partial<Omit<Materia, 'id'
         where: { id },
         data: updateData,
         include: {
-            docente: true,  
-            alumnos: {
-                include: {
-                    usuario: true, 
-                    materias: true  
-                }
-            }
+            docente: true,
+            cursos: true
         }
     });
 }
@@ -83,12 +74,7 @@ export async function deleteMateria(id: string): Promise<Materia> {
         where: { id },
         include: {
             docente: true, 
-            alumnos: {
-                include: {
-                    usuario: true,
-                    materias: true 
-                }
-            }
+            cursos: true
         }
     });
 }
