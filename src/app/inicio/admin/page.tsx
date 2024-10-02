@@ -106,7 +106,7 @@ export default function InicioAdmin() {
             <div className="space-y-6">
               <div className="flex">
                 <Label htmlFor="matricula" className="mr-4 mt-2 w-36">Matrícula: *</Label>
-                <Input id="matricula" placeholder="Ingresar la matrícula" />
+                <Input id="matricula" placeholder="Ingresar la matrícula" required/>
               </div>
               <div className="flex">
                 <Label className="mr-4 mt-2 w-36">Materia/s:</Label>
@@ -133,7 +133,7 @@ export default function InicioAdmin() {
           <div className="flex w-full space-x-8 space-y-4 justify-evenly">
             <div className="flex gap-6 align-top">
               <Label htmlFor="curso" className="text-lg font-semibold">Curso *</Label>
-              <RadioGroup name="curso" onValueChange={handleCursoChange} className="flex flex-col space-y-1 border border-gray-600 rounded p-4 pr-5">
+              <RadioGroup name="curso" onValueChange={handleCursoChange} className="flex flex-col space-y-1 border border-gray-600 rounded p-4 pr-5" required>
                 {['curso1', 'curso2', 'curso3'].map((curso) => (
                   <div key={curso} className="flex items-center space-x-2">
                     <RadioGroupItem value={curso} id={curso} />
@@ -144,7 +144,7 @@ export default function InicioAdmin() {
             </div>
             <div className="flex flex-col space-y-2">
               <div className="flex">
-                <Label htmlFor="padreTutor" className="mr-2 mt-2 w-40">Padre/Tutor: *</Label>
+                <Label htmlFor="padreTutor" className="mr-2 mt-2 w-40">Padre/Tutor:</Label>
                 <Input
                   id="padreTutor"
                   name="padreTutor"
@@ -157,6 +157,7 @@ export default function InicioAdmin() {
                   id="matricula"
                   name="matricula"
                   placeholder="Ingresar la matrícula"
+									required
                 />
               </div>
             </div>
