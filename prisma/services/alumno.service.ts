@@ -6,27 +6,29 @@ function stripTime(date: Date): Date {
     return new Date(date.toISOString().split('T')[0]);
 }
 
-export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario'> & { usuario: { usuario: string; password: string }, materiasIds: string[] }): Promise<Alumno> {
-    const { fechaNacimiento, materiasIds, ...rest } = data;
+export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario'> & { usuario: { usuario: string; password: string } }): Promise<Alumno> {
+    const { padreId, usuario, ...rest } = data;
 
-    return prisma.alumno.create({
-        data: {
-            ...rest,
-            fechaNacimiento: stripTime(fechaNacimiento),
-            usuario: {
-                create: {
-                    usuario: data.usuario.usuario,
-                    password: data.usuario.password,
-                    rol: Rol.ALUMNO
-                }
-            },
-            materias: {
-                connect: materiasIds.map((id) => ({ id }))
+    const alumnoData: any = {
+        ...rest,
+        usuario: {
+            create: {
+                usuario: usuario.usuario,
+                password: usuario.password,
+                rol: Rol.ALUMNO
             }
         },
+        cursoId: data.cursoId
+    };
+
+    if (padreId) {
+        alumnoData.padreId = padreId;
+    }
+
+    return prisma.alumno.create({
+        data: alumnoData,
         include: {
-            usuario: true,
-            materias: true 
+            usuario: true
         }
     });
 }
@@ -35,14 +37,9 @@ export async function getAlumno(id: string): Promise<Alumno | null> {
     const alumno = await prisma.alumno.findUnique({
         where: { id },
         include: {
-            usuario: true,
-            materias: true
+            usuario: true
         }
     });
-    
-    if (alumno) {
-        alumno.fechaNacimiento = stripTime(alumno.fechaNacimiento);
-    }
 
     return alumno;
 }
@@ -50,18 +47,16 @@ export async function getAlumno(id: string): Promise<Alumno | null> {
 export async function getAllAlumnos(): Promise<Alumno[]> {
     const alumnos = await prisma.alumno.findMany({
         include: {
-            usuario: true,
-            materias: true
+            usuario: true
         }
     });
     return alumnos.map((alumno) => ({
-        ...alumno,
-        fechaNacimiento: stripTime(alumno.fechaNacimiento),
+        ...alumno
     }));
 }
 
 export async function updateAlumno(id: string, data: Partial<Omit<Alumno, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string } }): Promise<Alumno> {
-    const { fechaNacimiento, ...rest } = data;
+    const { ...rest } = data;
     const updateData: any = { ...rest };
 
     if (data.usuario) {
@@ -76,12 +71,10 @@ export async function updateAlumno(id: string, data: Partial<Omit<Alumno, 'id' |
     return prisma.alumno.update({
         where: { id },
         data: {
-            ...updateData,
-            ...(fechaNacimiento && { fechaNacimiento: stripTime(fechaNacimiento) })
+            ...updateData
         },
         include: {
-            usuario: true, 
-            materias: true
+            usuario: true
         }
     });
 }
@@ -90,8 +83,7 @@ export async function deleteAlumno(id: string): Promise<Alumno> {
     return prisma.alumno.delete({
         where: { id },
         include: {
-            usuario: true,
-            materias: true
+            usuario: true
         }
     });
 }

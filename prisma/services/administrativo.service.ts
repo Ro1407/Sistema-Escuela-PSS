@@ -9,6 +9,7 @@ export async function createAdministrativo(
         data: {
             nombre: data.nombre,
             apellido: data.apellido,
+            dni: data.dni,
             direccion: data.direccion,
             numeroTelefono: data.numeroTelefono,
             correoElectronico: data.correoElectronico,
