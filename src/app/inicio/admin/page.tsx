@@ -20,35 +20,25 @@ export default function InicioAdmin() {
   const initialState = { errors: null, message: null };
   const [state, dispatch] = useFormState(sendUser, initialState);
 
-  const [materias, setMaterias] = useState([''])
   const [hijos, setHijos] = useState([''])
   const [formData, setFormData] = useState({
     user: '',
     curso: '',
-    materias: materias,
+    materia: '',
     hijos: hijos,
   })
   
 
   const handleUserChange = (value: string) => {
     setFormData(prevData => ({ ...prevData, user: value }))
-    if (value !== 'docente') {
-      setMaterias([''])
-    }
   }
 
   const handleCursoChange = (value: string) => {
     setFormData(prevData => ({ ...prevData, curso: value }))
   }
 
-  const handleAddMateria = () => {
-    setMaterias([...materias, ''])
-  }
-
-  const handleMateriaChange = (index: number, value: string) => {
-    const newMaterias = [...materias]
-    newMaterias[index] = value
-    setMaterias(newMaterias)
+  const handleMateriaChange = (value: string) => {
+    setFormData(prevData => ({ ...prevData, materia: value }))
   }
 
   const handleAddHijo = () => {
@@ -120,28 +110,17 @@ export default function InicioAdmin() {
               </div>
               <div className="flex">
                 <Label className="mr-4 mt-2 w-36">Materia/s:</Label>
-                <div className="flex flex-col space-y-2">
-                  {materias.map((materia, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <Input
-                        id={`materia-${index}`}
-                        name="materia[]"
-                        value={materia}
-                        onChange={(e) => handleMateriaChange(index, e.target.value)}
-                        placeholder={`Materia ${index + 1}`}
-                      />
-                      {index === materias.length - 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleAddMateria}
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+                <div className="flex flex-col space-y-2 w-full">
+									<Select name="materias" required onValueChange={handleMateriaChange} value={formData.materia}>
+										<SelectTrigger id="materias" className="w-full">
+											<SelectValue placeholder="Materias" />
+										</SelectTrigger>
+										<SelectContent>
+											{['Materia 1', 'Materia 2', 'Materia 3'].map((materia, index) => (
+												<SelectItem key={index} value={`materia_${index}`}>{materia}</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
                 </div>
               </div>
             </div>
@@ -227,7 +206,5 @@ export default function InicioAdmin() {
         </p>
       )}
     </form >
-
-
   )
 }
