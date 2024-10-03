@@ -2,7 +2,7 @@ import prisma from '../prismaClientInitialization'
 import { Docente } from '../interfaces'
 import { Rol } from '@prisma/client'; 
 
-export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { usuario: { usuario: string; password: string }, materiasIds: string[] }): Promise<Docente> {
+export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { usuario: { usuario: string; password: string }}): Promise<Docente> {
     return prisma.docente.create({
         data: {
             nombre: data.nombre,
@@ -18,9 +18,6 @@ export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { us
                     password: data.usuario.password,
                     rol: Rol.DOCENTE
                 }
-            },
-            cursos: {
-                connect: data.materiasIds.map((id) => ({ id: id }))
             },
             materia: {
                 connect: { id: data.materiaId }
@@ -52,7 +49,7 @@ export async function getAllDocentes(): Promise<Docente[]> {
     });
 }
 
-export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string }, materiasIds?: string[] }): Promise<Docente> {
+export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string }}): Promise<Docente> {
     const updateData: any = { ...data };
 
     if (data.usuario) {
@@ -61,12 +58,6 @@ export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id'
                 ...(data.usuario.usuario && { usuario: data.usuario.usuario }),
                 ...(data.usuario.password && { password: data.usuario.password })
             }
-        };
-    }
-
-    if (data.materiasIds) {
-        updateData.materias = {
-            set: data.materiasIds.map((id) => ({ id })) 
         };
     }
 
