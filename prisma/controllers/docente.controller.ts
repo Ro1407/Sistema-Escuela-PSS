@@ -25,6 +25,16 @@ export async function getDocente(req: Request, res: Response) {
     }
 }
 
+export async function getAllDocentes(req: Request, res: Response) {
+    try {
+        const docentes = await docenteService.getAllDocentes();
+        res.json(docentes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving all docentes' });
+    }
+}
+
 export async function updateDocente(req: Request, res: Response) {
     try {
         const docente = await docenteService.updateDocente(req.params.id, req.body);
