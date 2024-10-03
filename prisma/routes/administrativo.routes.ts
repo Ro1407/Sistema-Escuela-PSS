@@ -3,8 +3,9 @@ import * as administrativoController from '../controllers/administrativo.control
 
 const router = express.Router()
 
-router.post('/', administrativoController.createAdministrativo)
+router.get('/', administrativoController.getAllAdministrativos)
 router.get('/:id', administrativoController.getAdministrativo)
+router.post('/', administrativoController.createAdministrativo)
 router.put('/:id', administrativoController.updateAdministrativo)
 router.delete('/:id', administrativoController.deleteAdministrativo)
 

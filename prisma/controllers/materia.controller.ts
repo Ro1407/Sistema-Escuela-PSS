@@ -25,6 +25,16 @@ export async function getMateria(req: Request, res: Response) {
     }
 }
 
+export async function getAllMaterias(req: Request, res: Response) {
+    try {
+        const materias = await materiaService.getAllMaterias();
+        res.json(materias);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving all materias' });
+    }
+}
+
 export async function updateMateria(req: Request, res: Response) {
     try {
         const materia = await materiaService.updateMateria(req.params.id, req.body);

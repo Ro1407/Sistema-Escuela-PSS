@@ -25,6 +25,16 @@ export async function getAdministrativo(req: Request, res: Response) {
     }
 }
 
+export async function getAllAdministrativos(req: Request, res: Response) {
+    try {
+        const administrativos = await administrativoService.getAllAdministrativos();
+        res.json(administrativos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving all administrativos' });
+    }
+}
+
 export async function updateAdministrativo(req: Request, res: Response) {
     try {
         const administrativo = await administrativoService.updateAdministrativo(req.params.id, req.body);

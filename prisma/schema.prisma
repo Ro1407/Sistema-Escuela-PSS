@@ -1,72 +1,96 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+model Usuario {
+  id             String          @id @default(uuid())
+  usuario        String          @unique
+  password       String
+  rol            Rol
+  padre          Padre?
+  alumno         Alumno?
+  docente        Docente?
+  administrativo Administrativo?
+}
+
+enum Rol {
+  PADRE
+  ALUMNO
+  DOCENTE
+  ADMINISTRATIVO
+}
+
 model Padre {
-  id                String   @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String   @id @unique @default(uuid())
+  usuario           Usuario  @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
+  dni               String   @unique
   direccion         String
   numeroTelefono    String
   correoElectronico String   @unique
-  hijos             Alumno[]
+  hijos             Alumno[] @relation("PadreHijos")
 }
 
 model Alumno {
-  id                String   @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String  @id @unique @default(uuid())
+  usuario           Usuario @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
-  fechaNacimiento   DateTime
-  curso             String
-  numeroMatricula   String   @unique
+  dni               String  @unique
+  numeroMatricula   String  @unique
   direccion         String
   telefono          String
-  correoElectronico String   @unique
-  padres            Padre[]
-  materias          Materia[]
+  correoElectronico String  @unique
+  padre             Padre?  @relation("PadreHijos", fields: [padreId], references: [id])
+  padreId           String?
+  curso             Curso   @relation(name: "AlumnoCurso", fields: [cursoId], references: [id])
+  cursoId           String
 }
 
 model Docente {
-  id                String   @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String  @id @unique @default(uuid())
+  usuario           Usuario @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
+  dni               String  @unique
   direccion         String
-  matricula         String   @unique
+  matricula         String  @unique
   numeroTelefono    String
-  correoElectronico String   @unique
-  materiasDadas     Materia[]
+  correoElectronico String  @unique
+  cursos            Curso[] @relation("DocenteCurso")
+  materia           Materia @relation(fields: [materiaId], references: [id], name: "DocenteMateria")
+  materiaId         String  @unique
 }
 
 model Administrativo {
-  id                String @id @default(uuid())
-  usuario           String   @unique
-  password          String
+  id                String  @id @unique @default(uuid())
+  usuario           Usuario @relation(fields: [id], references: [id])
   nombre            String
   apellido          String
+  dni               String  @unique
   direccion         String
   numeroTelefono    String
-  correoElectronico String @unique
+  correoElectronico String  @unique
 }
 
 model Materia {
-  id        String   @id @default(uuid())
-  nombre    String
-  docente   Docente  @relation(fields: [docenteId], references: [id])
-  docenteId String
-  alumnos   Alumno[]
+  id      String   @id @default(uuid())
+  nombre  String
+  docente Docente? @relation(name: "DocenteMateria")
+  cursos  Curso[]  @relation("MateriaCurso")
+}
+
+model Curso {
+  id       String    @id @default(uuid())
+  nombre   String
+  materias Materia[] @relation("MateriaCurso")
+  docentes Docente[] @relation("DocenteCurso")
+  alumnos  Alumno[]  @relation(name: "AlumnoCurso")
 }
