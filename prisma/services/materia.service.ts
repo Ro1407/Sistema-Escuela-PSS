@@ -5,9 +5,7 @@ export async function createMateria(data: Omit<Materia, 'id' | 'docente' | 'curs
     return prisma.materia.create({
         data: {
             nombre: data.nombre,
-            docente: {
-                connect: { id: data.docenteId }
-            },
+            docente: data.docenteId ? {connect: { id: data.docenteId } } : undefined,
             cursos: {
                 connect: data.cursosIds.map(id => ({ id }))
             }
@@ -44,6 +42,10 @@ export async function updateMateria(id: string, data: Partial<Omit<Materia, 'id'
     if (data.docenteId) {
         updateData.docente = {
             connect: { id: data.docenteId }
+        };
+    } else{
+        updateData.docente = {
+            connect: undefined
         };
     }
 
