@@ -52,6 +52,22 @@ export async function getAllAlumnos(): Promise<Alumno[]> {
     }));
 }
 
+export async function getAlumnosSinPadre(): Promise<{ id: string, nombre: string, apellido:string, correoElectronico:string }[]> {
+    const alumnosSinPadre = await prisma.alumno.findMany({
+        where: {
+            padreId: null
+        },
+        select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            correoElectronico: true,
+        }
+    });
+
+    return alumnosSinPadre;
+}
+
 export async function updateAlumno(id: string, data: Partial<Omit<Alumno, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string } }): Promise<Alumno> {
     const { ...rest } = data;
     const updateData: any = { ...rest };

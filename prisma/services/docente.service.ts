@@ -2,7 +2,9 @@ import prisma from '../prismaClientInitialization'
 import { Docente } from '../interfaces'
 import { Rol } from '@prisma/client'; 
 
-export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { usuario: { usuario: string; password: string }}): Promise<Docente> {
+export async function createDocente(data: Omit<Docente, 'id' | 'usuario' | 'cursos'> &
+    { usuario: { usuario: string; password: string }, cursosIds: string[]}): Promise<Docente> {
+
     return prisma.docente.create({
         data: {
             nombre: data.nombre,
@@ -12,6 +14,7 @@ export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { us
             matricula: data.matricula,
             numeroTelefono: data.numeroTelefono,
             correoElectronico: data.correoElectronico,
+            cursos: data.cursosIds ? {connect: data.cursosIds.map(id => ({id}))} : undefined,
             usuario: {
                 create: {
                     usuario: data.usuario.usuario,
