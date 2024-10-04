@@ -1,6 +1,6 @@
 import prisma from '../prismaClientInitialization';
-import { Padre } from '../interfaces';
-import { Rol } from '@prisma/client';
+import {Padre} from '../interfaces';
+import {Rol} from '@prisma/client';
 
 export async function createPadre(data: Omit<Padre, 'id' | 'usuario' | 'hijos'> & { usuario: { usuario: string; password: string }, hijosIds: string[] }): Promise<Padre> {
     return prisma.padre.create({
@@ -49,7 +49,7 @@ export async function getAllPadres(): Promise<Padre[]> {
 }
 
 export async function getAlumnosSinPadre(): Promise<{ id: string, nombre: string }[]> {
-    const alumnosSinPadre = await prisma.alumno.findMany({
+    return prisma.alumno.findMany({
         where: {
             padreId: null
         },
@@ -58,8 +58,6 @@ export async function getAlumnosSinPadre(): Promise<{ id: string, nombre: string
             nombre: true
         }
     });
-
-    return alumnosSinPadre;
 }
 
 export async function updatePadre(id: string, data: Partial<Omit<Padre, 'id' | 'usuario' | 'hijos'>> & { usuario?: { usuario?: string; password?: string }, hijosIds?: string[] }): Promise<Padre> {
