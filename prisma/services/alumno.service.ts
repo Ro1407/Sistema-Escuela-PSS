@@ -1,47 +1,44 @@
 import prisma from '../prismaClientInitialization';
-import { Alumno } from '../interfaces';
-import { Rol } from '@prisma/client'; 
-
-function stripTime(date: Date): Date {
-    return new Date(date.toISOString().split('T')[0]);
-}
+import {Alumno} from '../interfaces';
+import {Rol} from '@prisma/client';
 
 export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario'> & { usuario: { usuario: string; password: string } }): Promise<Alumno> {
-    const { padreId, usuario, ...rest } = data;
-
-    const alumnoData: any = {
-        ...rest,
-        usuario: {
-            create: {
-                usuario: usuario.usuario,
-                password: usuario.password,
-                rol: Rol.ALUMNO
-            }
-        },
-        cursoId: data.cursoId
-    };
-
-    if (padreId) {
-        alumnoData.padreId = padreId;
-    }
-
     return prisma.alumno.create({
-        data: alumnoData,
+        data: {
+            nombre: data.nombre,
+            apellido: data.apellido,
+            dni: data.dni,
+            numeroMatricula: data.numeroMatricula,
+            direccion: data.direccion,
+            telefono: data.telefono,
+            correoElectronico: data.correoElectronico,
+            usuario: {
+                create: {
+                    usuario: data.usuario.usuario,
+                    password: data.usuario.password,
+                    rol: Rol.ALUMNO
+                }
+            },
+            curso: {
+                connect: { id: data.cursoId }
+            },
+            padre: data.padreId ? { connect: { id: data.padreId } } : undefined
+        },
         include: {
-            usuario: true
+            usuario: true,
+            curso: true,
+            padre: true
         }
     });
 }
 
 export async function getAlumno(id: string): Promise<Alumno | null> {
-    const alumno = await prisma.alumno.findUnique({
-        where: { id },
+    return prisma.alumno.findUnique({
+        where: {id},
         include: {
             usuario: true
         }
     });
-
-    return alumno;
 }
 
 export async function getAllAlumnos(): Promise<Alumno[]> {
