@@ -115,6 +115,7 @@ async function sendAlumno(formData: FormData) : Promise<State>{
 async function sendDocente(formData: FormData) : Promise<State>{
   let docente: Docente | undefined;
   const dni = formData.get('dni')?.toString()  || ''
+  const correoElectronico = formData.get('email')?.toString()  || ''
   console.log(formData)
   const cursos = formData.getAll('cursos[]').map(curso => curso.toString())
   console.log(cursos)
@@ -123,16 +124,17 @@ async function sendDocente(formData: FormData) : Promise<State>{
       apellido : getApellido(formData.get('name')?.toString()) || 'null',
       direccion : formData.get('address')?.toString() || 'null',
       numeroTelefono : formData.get('phone')?.toString() || 'null',
-      correoElectronico : formData.get('email')?.toString() || 'null',
+      correoElectronico : correoElectronico || 'null',
       matricula : formData.get('matricula')?.toString() || 'null',
-      materias : formData.getAll('materias[]').map(materia => materia.toString()),
-      cursos : formData.getAll('cursos[]').map(curso => curso.toString()),
+      materiaId : formData.get('materia')?.toString() || 'null',
+      dni: dni,
+      cursosIds : formData.getAll('cursos[]').map(curso => curso.toString()),
       usuario: {
-          usuario: dni,
+          usuario: correoElectronico,
           password: dni
       }
   }
-  /*
+  
   if(docente && await registrarDocente(docente))
   return {
       message: "Usuario Registrado"
@@ -142,10 +144,6 @@ async function sendDocente(formData: FormData) : Promise<State>{
       errors: "datos de docente invalidos / db",
       message: "Error creando usuario"
     }
-  */
-  return {
-    message: "Usuario Registrado"
-  }
 }
 
 
@@ -192,7 +190,7 @@ async function registrarAlumno(alumno : Alumno){
       return false
   }
 }
-
+*/
 
 async function registrarDocente(docente : Docente){
   try{
@@ -206,6 +204,7 @@ async function registrarDocente(docente : Docente){
 }
 
 
+/*
 async function registrarPadre(padre : Padre){
   try{
       await createPadre(padre)

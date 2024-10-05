@@ -10,9 +10,9 @@ import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { useFormState } from "react-dom";
 import { sendUser } from '@/lib/actions';
-import { Materia } from "../../../../prisma/interfaces";
+import { Curso, Materia } from "../../../../prisma/interfaces";
 
-export default function CreateUserForm( {materias}: {materias: Materia[]}) {
+export default function CreateUserForm( {materias, cursos}: {materias: Materia[], cursos: Curso[]}) {
   //Utilizar server action
   const initialState = { errors: null, message: null };
   const [state, dispatch] = useFormState(sendUser, initialState);
@@ -91,10 +91,10 @@ export default function CreateUserForm( {materias}: {materias: Materia[]}) {
             <div className="flex gap-6 align-top mb-6 md:mb-0">
               <Label className="text-lg font-semibold">Curso/s *:</Label>
               <div className="flex flex-col space-y-2 border border-gray-600 rounded p-4 pr-5">
-                {['Curso 1', 'Curso 2', 'Curso 3'].map((curso, index) => (
+                {cursos.map((curso, index) => (
                   <div key={index} className="flex items-center space-x-2">
-                    <Checkbox id={`curso-${index}`} name={'cursos[]'} value={curso}/>
-                    <Label htmlFor={`curso-${index}`}>{curso}</Label>
+                    <Checkbox id={curso.id} name={'cursos[]'} value={curso.id}/>
+                    <Label htmlFor={curso.id}>{curso.nombre}</Label>
                   </div>
                 ))}
               </div>
@@ -102,14 +102,14 @@ export default function CreateUserForm( {materias}: {materias: Materia[]}) {
             <div className="space-y-6">
               <div className="flex">
                 <Label htmlFor="matricula" className="mr-4 mt-2 w-36">Matrícula: *</Label>
-                <Input id="matricula" placeholder="Ingresar la matrícula" required/>
+                <Input id="matricula" name="matricula" placeholder="Ingresar la matrícula" required/>
               </div>
               <div className="flex">
-                <Label className="mr-4 mt-2 w-36">Materia/s:</Label>
+                <Label className="mr-4 mt-2 w-36">Materia:</Label>
                 <div className="flex flex-col space-y-2 w-full">
-									<Select name="materias" required onValueChange={handleMateriaChange} value={formData.materia}>
-										<SelectTrigger id="materias" className="w-full">
-											<SelectValue placeholder="Materias" />
+									<Select name="materia" required onValueChange={handleMateriaChange} value={formData.materia}>
+										<SelectTrigger id="materia" className="w-full">
+											<SelectValue placeholder="Materia" />
 										</SelectTrigger>
 										<SelectContent>
 											{materias.map((materia, index) => (
