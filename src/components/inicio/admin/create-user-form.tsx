@@ -11,8 +11,10 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import { sendUser } from '@/lib/actions';
 import { Curso, Materia } from "../../../../prisma/interfaces";
+import SearchablePeopleSelect from "./SearchableSelect";
+import SearchableSelect from "./SearchableSelect";
 
-export default function CreateUserForm( {materias, cursos}: {materias: Materia[], cursos: Curso[]}) {
+export default function CreateUserForm({ materias, cursos }: { materias: Materia[], cursos: Curso[] }) {
   //Utilizar server action
   const initialState = { errors: null, message: null };
   const [state, dispatch] = useFormState(sendUser, initialState);
@@ -24,7 +26,10 @@ export default function CreateUserForm( {materias, cursos}: {materias: Materia[]
     materia: '',
     hijos: hijos,
   })
-  
+
+
+
+
   const handleUserChange = (value: string) => {
     setFormData(prevData => ({ ...prevData, user: value }))
   }
@@ -67,7 +72,7 @@ export default function CreateUserForm( {materias, cursos}: {materias: Materia[]
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="email">Correo Electrónico: *</Label>
-        <Input id="email" name ="email" required />
+        <Input id="email" name="email" required />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="userType">Tipo de Usuario: *</Label>
@@ -93,7 +98,7 @@ export default function CreateUserForm( {materias, cursos}: {materias: Materia[]
               <div className="flex flex-col space-y-2 border border-gray-600 rounded p-4 pr-5">
                 {cursos.map((curso, index) => (
                   <div key={index} className="flex items-center space-x-2">
-                    <Checkbox id={curso.id} name={'cursos[]'} value={curso.id}/>
+                    <Checkbox id={curso.id} name={'cursos[]'} value={curso.id} />
                     <Label htmlFor={curso.id}>{curso.nombre}</Label>
                   </div>
                 ))}
@@ -102,21 +107,21 @@ export default function CreateUserForm( {materias, cursos}: {materias: Materia[]
             <div className="space-y-6">
               <div className="flex">
                 <Label htmlFor="matricula" className="mr-4 mt-2 w-36">Matrícula: *</Label>
-                <Input id="matricula" name="matricula" placeholder="Ingresar la matrícula" required/>
+                <Input id="matricula" name="matricula" placeholder="Ingresar la matrícula" required />
               </div>
               <div className="flex">
                 <Label className="mr-4 mt-2 w-36">Materia:</Label>
                 <div className="flex flex-col space-y-2 w-full">
-									<Select name="materia" required onValueChange={handleMateriaChange} value={formData.materia}>
-										<SelectTrigger id="materia" className="w-full">
-											<SelectValue placeholder="Materia" />
-										</SelectTrigger>
-										<SelectContent>
-											{materias.map((materia, index) => (
-												<SelectItem key={index} value={materia.id}>{materia.nombre}</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+                  <Select name="materia" required onValueChange={handleMateriaChange} value={formData.materia}>
+                    <SelectTrigger id="materia" className="w-full">
+                      <SelectValue placeholder="Materia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {materias.map((materia, index) => (
+                        <SelectItem key={index} value={materia.id}>{materia.nombre}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
@@ -130,30 +135,22 @@ export default function CreateUserForm( {materias, cursos}: {materias: Materia[]
             <div className="flex gap-6 align-top">
               <Label htmlFor="curso" className="text-lg font-semibold">Curso *</Label>
               <RadioGroup name="curso" onValueChange={handleCursoChange} className="flex flex-col space-y-1 border border-gray-600 rounded p-4 pr-5" required>
-                {['curso1', 'curso2', 'curso3'].map((curso) => (
-                  <div key={curso} className="flex items-center space-x-2">
-                    <RadioGroupItem value={curso} id={curso} />
-                    <Label htmlFor={curso}>{curso.charAt(0).toUpperCase() + curso.slice(1)}</Label>
+                {cursos.map((curso) => (
+                  <div key={curso.id} className="flex items-center space-x-2">
+                    <RadioGroupItem value={curso.id} id={curso.id} />
+                    <Label htmlFor={curso.id}>{curso.nombre}</Label>
                   </div>
                 ))}
               </RadioGroup>
             </div>
             <div className="flex flex-col space-y-2">
               <div className="flex">
-                <Label htmlFor="padreTutor" className="mr-2 mt-2 w-40">Padre/Tutor:</Label>
-                <Input
-                  id="padreTutor"
-                  name="padreTutor"
-                  placeholder="Ingresar padre/tutor"
-                />
-              </div>
-              <div className="flex">
                 <Label htmlFor="matricula" className="mr-2 mt-2 w-40">Matrícula: *</Label>
                 <Input
                   id="matricula"
                   name="matricula"
                   placeholder="Ingresar la matrícula"
-									required
+                  required
                 />
               </div>
             </div>
@@ -184,24 +181,25 @@ export default function CreateUserForm( {materias, cursos}: {materias: Materia[]
                     <PlusCircle className="h-4 w-4" />
                   </Button>
                 )}
+
               </div>
             ))}
           </div>
         </div>
       )
       }
-      
+
       <div className="flex align-center">
         <p >(*) Campos OBLIGATORIOS</p>
         <Button type="submit" className="w-60 ml-auto">Crear</Button>
       </div>
 
       {
-      state?.message && (
-        <p className={`mt-4 text-center ${state.errors? 'text-red-600' : 'text-green-600'}`}>
-          {state.message}
-        </p>
-      )}
+        state?.message && (
+          <p className={`mt-4 text-center ${state.errors ? 'text-red-600' : 'text-green-600'}`}>
+            {state.message}
+          </p>
+        )}
     </form >
   )
 }
