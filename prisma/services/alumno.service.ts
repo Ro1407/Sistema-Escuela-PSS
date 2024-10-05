@@ -1,18 +1,17 @@
 import prisma from '../prismaClientInitialization';
-import { Alumno } from '../interfaces';
-import { Rol } from '@prisma/client'; 
+import {Alumno} from '../interfaces';
+import {Rol} from '@prisma/client';
 
-function stripTime(date: Date): Date {
-    return new Date(date.toISOString().split('T')[0]);
-}
-
-export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario' | 'materias'> & { usuario: { usuario: string; password: string }, materiasIds: string[] }): Promise<Alumno> {
-    const { fechaNacimiento, materiasIds, ...rest } = data;
-
+export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario'> & { usuario: { usuario: string; password: string } }): Promise<Alumno> {
     return prisma.alumno.create({
         data: {
-            ...rest,
-            fechaNacimiento: stripTime(fechaNacimiento),
+            nombre: data.nombre,
+            apellido: data.apellido,
+            dni: data.dni,
+            numeroMatricula: data.numeroMatricula,
+            direccion: data.direccion,
+            telefono: data.telefono,
+            correoElectronico: data.correoElectronico,
             usuario: {
                 create: {
                     usuario: data.usuario.usuario,
@@ -20,48 +19,55 @@ export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario' | 'materi
                     rol: Rol.ALUMNO
                 }
             },
-            materias: {
-                connect: materiasIds.map((id) => ({ id }))
-            }
+            curso: {
+                connect: { id: data.cursoId }
+            },
+            padre: data.padreId ? { connect: { id: data.padreId } } : undefined
         },
         include: {
             usuario: true,
-            materias: true 
+            curso: true,
+            padre: true
         }
     });
 }
 
 export async function getAlumno(id: string): Promise<Alumno | null> {
-    const alumno = await prisma.alumno.findUnique({
-        where: { id },
+    return prisma.alumno.findUnique({
+        where: {id},
         include: {
-            usuario: true,
-            materias: true
+            usuario: true
         }
     });
-    
-    if (alumno) {
-        alumno.fechaNacimiento = stripTime(alumno.fechaNacimiento);
-    }
-
-    return alumno;
 }
 
 export async function getAllAlumnos(): Promise<Alumno[]> {
     const alumnos = await prisma.alumno.findMany({
         include: {
-            usuario: true,
-            materias: true
+            usuario: true
         }
     });
     return alumnos.map((alumno) => ({
-        ...alumno,
-        fechaNacimiento: stripTime(alumno.fechaNacimiento),
+        ...alumno
     }));
 }
 
+export async function getAlumnosSinPadre(): Promise<{ id: string, nombre: string, apellido:string, correoElectronico:string }[]> {
+    return prisma.alumno.findMany({
+        where: {
+            padreId: null
+        },
+        select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            correoElectronico: true,
+        }
+    });
+}
+
 export async function updateAlumno(id: string, data: Partial<Omit<Alumno, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string } }): Promise<Alumno> {
-    const { fechaNacimiento, ...rest } = data;
+    const { ...rest } = data;
     const updateData: any = { ...rest };
 
     if (data.usuario) {
@@ -76,12 +82,10 @@ export async function updateAlumno(id: string, data: Partial<Omit<Alumno, 'id' |
     return prisma.alumno.update({
         where: { id },
         data: {
-            ...updateData,
-            ...(fechaNacimiento && { fechaNacimiento: stripTime(fechaNacimiento) })
+            ...updateData
         },
         include: {
-            usuario: true, 
-            materias: true
+            usuario: true
         }
     });
 }
@@ -90,8 +94,7 @@ export async function deleteAlumno(id: string): Promise<Alumno> {
     return prisma.alumno.delete({
         where: { id },
         include: {
-            usuario: true,
-            materias: true
+            usuario: true
         }
     });
 }

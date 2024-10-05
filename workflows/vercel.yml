@@ -1,0 +1,42 @@
+name: Vercel
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  vercel_deploy:
+    name: Vercel Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+      statuses: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: BetaHuhn/deploy-to-vercel-action@v1
+        id: vercel
+        with:
+          CREATE_COMMENT: true
+          ATTACH_COMMIT_METADATA: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          PRODUCTION: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Post Vercel Deployment Status
+        if: always()
+        run: |
+          DEPLOYMENT_URL=$(jq -r '.deploymentUrl' < $GITHUB_WORKSPACE/deployment.json)
+          DEPLOYMENT_STATUS=$(jq -r '.deploymentStatus' < $GITHUB_WORKSPACE/deployment.json)
+          if [ "$DEPLOYMENT_STATUS" == "SUCCESS" ]; then
+            COMMENT="Vercel deployment succeeded: $DEPLOYMENT_URL"
+          else
+            COMMENT="Vercel deployment failed: $DEPLOYMENT_URL"
+          fi
+          gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
