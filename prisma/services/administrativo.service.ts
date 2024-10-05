@@ -5,10 +5,11 @@ import { Administrativo } from '../interfaces';
 export async function createAdministrativo(
     data: Omit<Administrativo, 'id' | 'usuario'> & { usuario: { usuario: string; password: string } }
 ): Promise<Administrativo> {
-    return await prisma.administrativo.create({
+    return prisma.administrativo.create({
         data: {
             nombre: data.nombre,
             apellido: data.apellido,
+            dni: data.dni,
             direccion: data.direccion,
             numeroTelefono: data.numeroTelefono,
             correoElectronico: data.correoElectronico,
