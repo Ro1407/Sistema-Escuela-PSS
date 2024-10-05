@@ -64,8 +64,9 @@ export interface Docente {
   matricula: string;
   numeroTelefono: string;
   correoElectronico: string;
-  materias : string[]
-  cursos : string[]
+  dni: string;
+  materiaId : string
+  cursosIds : string[]
 }
 
 export interface Padre {
