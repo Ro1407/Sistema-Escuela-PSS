@@ -1,12 +1,13 @@
 import prisma from '../prismaClientInitialization';
-import { Padre } from '../interfaces';
-import { Rol } from '@prisma/client';
+import {Padre} from '../interfaces';
+import {Rol} from '@prisma/client';
 
-export async function createPadre(data: Omit<Padre, 'id' | 'usuario'> & { usuario: { usuario: string; password: string } }): Promise<Padre> {
+export async function createPadre(data: Omit<Padre, 'id' | 'usuario' | 'hijos'> & { usuario: { usuario: string; password: string }, hijosIds: string[] }): Promise<Padre> {
     return prisma.padre.create({
         data: {
             nombre: data.nombre,
             apellido: data.apellido,
+            dni: data.dni,
             direccion: data.direccion,
             numeroTelefono: data.numeroTelefono,
             correoElectronico: data.correoElectronico,
@@ -16,10 +17,14 @@ export async function createPadre(data: Omit<Padre, 'id' | 'usuario'> & { usuari
                     password: data.usuario.password,
                     rol: Rol.PADRE
                 }
+            },
+            hijos: {
+                connect: data.hijosIds.map(id => ({ id }))
             }
         },
         include: {
-            usuario: true 
+            usuario: true,
+            hijos: true
         }
     });
 }
@@ -28,7 +33,8 @@ export async function getPadre(id: string): Promise<Padre | null> {
     return prisma.padre.findUnique({
         where: { id },
         include: {
-            usuario: true
+            usuario: true,
+            hijos: true
         }
     });
 }
@@ -36,12 +42,25 @@ export async function getPadre(id: string): Promise<Padre | null> {
 export async function getAllPadres(): Promise<Padre[]> {
     return prisma.padre.findMany({
         include: {
-            usuario: true
+            usuario: true,
+            hijos: true
         }
     });
 }
 
-export async function updatePadre(id: string, data: Partial<Omit<Padre, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string } }): Promise<Padre> {
+export async function getAlumnosSinPadre(): Promise<{ id: string, nombre: string }[]> {
+    return prisma.alumno.findMany({
+        where: {
+            padreId: null
+        },
+        select: {
+            id: true,
+            nombre: true
+        }
+    });
+}
+
+export async function updatePadre(id: string, data: Partial<Omit<Padre, 'id' | 'usuario' | 'hijos'>> & { usuario?: { usuario?: string; password?: string }, hijosIds?: string[] }): Promise<Padre> {
     const updateData: any = { ...data };
 
     if (data.usuario) {
@@ -53,11 +72,18 @@ export async function updatePadre(id: string, data: Partial<Omit<Padre, 'id' | '
         };
     }
 
+    if (data.hijosIds) {
+        updateData.hijos = {
+            set: data.hijosIds.map(id => ({ id }))
+        };
+    }
+
     return prisma.padre.update({
         where: { id },
         data: updateData,
         include: {
-            usuario: true
+            usuario: true,
+            hijos: true 
         }
     });
 }
@@ -66,7 +92,8 @@ export async function deletePadre(id: string): Promise<Padre> {
     return prisma.padre.delete({
         where: { id },
         include: {
-            usuario: true
+            usuario: true,
+            hijos: true
         }
     });
 }

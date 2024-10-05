@@ -1,49 +1,55 @@
 // TypeScript interfaces for Prisma models
 import { Usuario as PrismaUsuario } from '@prisma/client';
 
-export interface Usuario extends PrismaUsuario {}
+export interface Usuario extends PrismaUsuario {
+    padre?: Padre | null;
+    alumno?: Alumno | null;
+    docente?: Docente | null;
+    administrativo?: Administrativo | null;
+}
 
 export interface Padre {
     id: string;
-    usuario: Usuario; 
     nombre: string;
     apellido: string;
+    dni: string;
     direccion: string;
     numeroTelefono: string;
     correoElectronico: string;
+    hijos: Alumno[];
 }
 
 export interface Alumno {
     id: string;
-    usuario: Usuario;
     nombre: string;
     apellido: string;
-    fechaNacimiento: Date;
-    curso: string;
+    dni: string;
     numeroMatricula: string;
     direccion: string;
     telefono: string;
     correoElectronico: string;
-    materias: Materia[];
+    padreId?: string | null; 
+    cursoId: string;
 }
 
 export interface Docente {
     id: string;
-    usuario: Usuario;
     nombre: string;
     apellido: string;
+    dni: string;
     direccion: string;
     matricula: string;
     numeroTelefono: string;
     correoElectronico: string;
-    materias: Materia[];
+    cursos?: Curso[];
+    materiaId: string;
 }
 
 export interface Administrativo {
     id: string;
-    usuario: Usuario;
     nombre: string;
     apellido: string;
+    dni: string;
     direccion: string;
     numeroTelefono: string;
     correoElectronico: string;
@@ -52,6 +58,14 @@ export interface Administrativo {
 export interface Materia {
     id: string;
     nombre: string;
-    docenteId: string;
+    docente?: Docente | null;
+    cursos: Curso[];
+}
+
+export interface Curso {
+    id: string;
+    nombre: string;
+    materias?: Materia[];
+    docentes?: Docente[];
     alumnos?: Alumno[];
 }

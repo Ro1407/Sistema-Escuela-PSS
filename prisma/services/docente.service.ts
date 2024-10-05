@@ -2,15 +2,19 @@ import prisma from '../prismaClientInitialization'
 import { Docente } from '../interfaces'
 import { Rol } from '@prisma/client'; 
 
-export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { usuario: { usuario: string; password: string }, materiasIds: string[] }): Promise<Docente> {
+export async function createDocente(data: Omit<Docente, 'id' | 'usuario' | 'cursos'> &
+    { usuario: { usuario: string; password: string }, cursosIds: string[]}): Promise<Docente> {
+
     return prisma.docente.create({
         data: {
             nombre: data.nombre,
             apellido: data.apellido,
+            dni: data.dni,
             direccion: data.direccion,
             matricula: data.matricula,
             numeroTelefono: data.numeroTelefono,
             correoElectronico: data.correoElectronico,
+            cursos: data.cursosIds ? {connect: data.cursosIds.map(id => ({id}))} : undefined,
             usuario: {
                 create: {
                     usuario: data.usuario.usuario,
@@ -18,23 +22,23 @@ export async function createDocente(data: Omit<Docente, 'id' | 'usuario'> & { us
                     rol: Rol.DOCENTE
                 }
             },
-            materias: {
-                connect: data.materiasIds.map((id) => ({ id })) 
-            }
+            materia: {
+                connect: { id: data.materiaId }
+            },
         },
         include: {
             usuario: true,
-            materias: true 
+            cursos: true,
+            materia: true,
         }
     });
 }
-
 export async function getDocente(id: string): Promise<Docente | null> {
     return prisma.docente.findUnique({
         where: { id },
         include: {
             usuario: true, 
-            materias: true 
+            materia: true 
         }
     });
 }
@@ -43,12 +47,12 @@ export async function getAllDocentes(): Promise<Docente[]> {
     return prisma.docente.findMany({
         include: {
             usuario: true,
-            materias: true 
+            materia: true 
         }
     });
 }
 
-export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string }, materiasIds?: string[] }): Promise<Docente> {
+export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string }}): Promise<Docente> {
     const updateData: any = { ...data };
 
     if (data.usuario) {
@@ -60,18 +64,12 @@ export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id'
         };
     }
 
-    if (data.materiasIds) {
-        updateData.materias = {
-            set: data.materiasIds.map((id) => ({ id })) 
-        };
-    }
-
     return prisma.docente.update({
         where: { id },
         data: updateData,
         include: {
             usuario: true, 
-            materias: true
+            materia: true
         }
     });
 }
@@ -81,7 +79,7 @@ export async function deleteDocente(id: string): Promise<Docente> {
         where: { id },
         include: {
             usuario: true,
-            materias: true
+            materia: true
         }
     });
 }
