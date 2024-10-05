@@ -24,6 +24,12 @@ export type Alumno = {
 
   */
 
+  export interface UsuarioJWT {
+    id: string;
+    usuario: string,
+    rol: string
+  }
+
   export interface Alumno {
     nombre: string;
     apellido: string;

@@ -6,6 +6,8 @@ import { Docente, State } from "./definitions";
 import { Alumno, Padre } from "./definitions"
 import { createPadre } from '../../prisma/services/padre.service';
 import { createDocente } from '../../prisma/services/docente.service';
+import { createSession, deleteSession, getSession } from './session';
+import { redirect } from 'next/navigation';
 
 
 export type AuthState = {
@@ -36,12 +38,24 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
     else {
       return { error: 'User type not recognized', redirectPath: null };
     }
+    
+    await createSession(user);
 
     return { error: null, redirectPath };
   } catch (error) {
     console.error('Error validating user:', error);
     return { error: 'Ocurrió un error durante la validación', redirectPath: null };
   }
+}
+
+export async function fetchUserSession() {
+  const session = await getSession()
+  return session
+}
+
+export async function logout() {
+  await deleteSession()
+  redirect('/login')
 }
 
 export async function sendUser(prevState : State, formData : FormData) : Promise<State>{
@@ -80,7 +94,7 @@ async function sendAlumno(formData: FormData) : Promise<State>{
       },
       materiasIds: ["89becd5b-e960-4da9-87b5-8497ea5aa4bd"]
   }
-  
+  /*
   if(alumno && await registrarAlumno(alumno))
   return {
       message: "Usuario Registrado"
@@ -90,6 +104,11 @@ async function sendAlumno(formData: FormData) : Promise<State>{
       errors: "datos de alumno invalidos / db",
       message: "Error creando usuario"
     }
+    */
+
+  return {  
+    message: "Usuario Registrado"
+  }
 }
 
 
@@ -145,6 +164,7 @@ async function sendPadre(formData: FormData) : Promise<State>{
       },
       hijos: formData.getAll('hijos[]').map(hijo => hijo.toString()) //id para identificar a los hijos en la BD
   }
+  /*
   
   if(padre && await registrarPadre(padre))
   return {
@@ -155,9 +175,13 @@ async function sendPadre(formData: FormData) : Promise<State>{
       errors: "datos de alumno invalidos / db",
       message: "Error creando usuario"
     }
+      */
+  return {
+    message: "Usuario Registrado"
+  }
 }
 
-
+/*
 async function registrarAlumno(alumno : Alumno){
   try{
       await createAlumno(alumno)
@@ -169,7 +193,7 @@ async function registrarAlumno(alumno : Alumno){
   }
 }
 
-/*
+
 async function registrarDocente(docente : Docente){
   try{
       await createDocente(docente)
@@ -180,7 +204,7 @@ async function registrarDocente(docente : Docente){
       return false
   }
 }
-*/
+
 
 async function registrarPadre(padre : Padre){
   try{
@@ -192,6 +216,8 @@ async function registrarPadre(padre : Padre){
       return false
   }
 }
+
+*/
 
 function getNombre(fullName : string | undefined) {
     if (!fullName) return null;

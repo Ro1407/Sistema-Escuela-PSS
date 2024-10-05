@@ -1,5 +1,3 @@
-'use client'
-
 import { Metadata } from "next"
 import CursosDropdown from "@/components/inicio/docente/drop-down";
 import {
@@ -9,52 +7,45 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import Link from "next/link";
-import clsx from "clsx";
-import { usePathname } from "next/navigation";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import Title from "@/components/inicio/Title";
+import InfoCurso from "@/components/inicio/docente/InfoCurso";
+import LogoutButton from "@/components/inicio/LogoutButton";
+import { fetchUserSession } from "@/lib/actions";
+import { getDocente } from "../../../../prisma/services/docente.service";
+import { redirect } from "next/navigation";
 
 const metadata: Metadata = {
   title: 'Inicio Docente',
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  const fechaActual = formatearFecha(new Date())
-  const pathname = usePathname();
+export default async function Layout({ children }: { children: React.ReactNode }) {
 
-  const getTitle = () => {
-    const segments = pathname.split('/');
-    var lastSegment = segments[segments.length - 1];
+  const session = await fetchUserSession()
 
-    // Eliminar guiones y poner la primera letra en mayúscula
-    lastSegment = lastSegment
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-
-    return (lastSegment === "Docente" ? "Inicio" : lastSegment);
-  };
+  if (!session || session.rol !== 'DOCENTE') {
+    redirect('/login')
+  }
+  const userId = session?.id
+  const docente = await getDocente(userId as string)
 
   return (
     <div className="h-screen flex flex-col p-5">
       <div className="flex flex-row justify-between">
-        <div className="flex flex-col items-center">
-          <h2 className="text-3xl font-semibold">{getTitle()}</h2>
-          <h2 className="text-md">{fechaActual}</h2>
-        </div>
+        <Title />
         <div className="flex space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 <div className="flex items-center space-x-2">
-                  <p>Nombre docente</p>
+                  <p>{docente?.nombre + " " + docente?.apellido}</p>
                   <ChevronDownIcon className="w-4 h-4" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
-                <Button variant="outline" size="sm" className="cursor-pointer border-none w-full">Cerrar Sesión</Button>
+                <LogoutButton />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -72,81 +63,4 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
     </div>
   );
-}
-
-function InfoCurso() {
-  const pathname = usePathname();
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" > Información del curso</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-black flex flex-col gap-2">
-        <DropdownMenuItem asChild>
-          <Link
-            href="/inicio/docente/trabajos-practicos"
-            className={clsx(
-              "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
-              pathname === '/inicio/docente/trabajos-practicos' ? 'bg-blue-700 text-white' : 'bg-white'
-            )}
-          >
-            Trabajos Prácticos
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link
-            href="/inicio/docente/notas"
-            className={clsx(
-              "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
-              pathname === '/inicio/docente/notas' ? 'bg-blue-700 text-white' : 'bg-white'
-            )}
-          >
-            Notas Exámenes
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link
-            href="/inicio/docente/asistencias"
-            className={clsx(
-              "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
-              pathname === '/inicio/docente/asistencias' ? 'bg-blue-700 text-white' : 'bg-white'
-            )}
-          >
-            Asistencias
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link
-            href="/inicio/docente/amonestaciones"
-            className={clsx(
-              "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
-              pathname === '/inicio/docente/amonestaciones' ? 'bg-blue-700 text-white' : 'bg-white'
-            )}
-          >
-            Amonestaciones
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link
-            href="/inicio/docente/boletines"
-            className={clsx(
-              "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
-              pathname === '/inicio/docente/boletines' ? 'bg-blue-700 text-white' : 'bg-white'
-            )}
-          >
-            Boletines
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
-function formatearFecha(fecha: Date) {
-  const dia = String(fecha.getDate()).padStart(2, '0'); // Asegura que el día tenga dos dígitos
-  const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses son 0-11, así que se suma 1
-  const año = fecha.getFullYear();
-  // Construye la fecha en el formato dd/mm/aaaa
-  const fechaFormateada = `${dia}/${mes}/${año}`;
-  return fechaFormateada
 }
