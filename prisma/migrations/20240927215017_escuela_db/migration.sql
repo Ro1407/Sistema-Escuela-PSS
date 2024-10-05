@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "Padre" (
+CREATE TABLE IF NOT EXISTS "Padre" (
     "id" TEXT NOT NULL,
     "usuario" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE "Padre" (
 );
 
 -- CreateTable
-CREATE TABLE "Alumno" (
+CREATE TABLE IF NOT EXISTS "Alumno" (
     "id" TEXT NOT NULL,
     "usuario" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE "Alumno" (
 );
 
 -- CreateTable
-CREATE TABLE "Docente" (
+CREATE TABLE IF NOT EXISTS "Docente" (
     "id" TEXT NOT NULL,
     "usuario" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE "Docente" (
 );
 
 -- CreateTable
-CREATE TABLE "Administrativo" (
+CREATE TABLE IF NOT EXISTS "Administrativo" (
     "id" TEXT NOT NULL,
     "usuario" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE "Administrativo" (
 );
 
 -- CreateTable
-CREATE TABLE "Materia" (
+CREATE TABLE IF NOT EXISTS "Materia" (
     "id" TEXT NOT NULL,
     "nombre" TEXT NOT NULL,
     "docenteId" TEXT NOT NULL,
@@ -68,70 +68,70 @@ CREATE TABLE "Materia" (
 );
 
 -- CreateTable
-CREATE TABLE "_AlumnoToPadre" (
+CREATE TABLE IF NOT EXISTS "_AlumnoToPadre" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "_AlumnoToMateria" (
+CREATE TABLE IF NOT EXISTS "_AlumnoToMateria" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Padre_usuario_key" ON "Padre"("usuario");
+CREATE UNIQUE INDEX IF NOT EXISTS "Padre_usuario_key" ON "Padre"("usuario");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Padre_correoElectronico_key" ON "Padre"("correoElectronico");
+CREATE UNIQUE INDEX IF NOT EXISTS "Padre_correoElectronico_key" ON "Padre"("correoElectronico");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Alumno_usuario_key" ON "Alumno"("usuario");
+CREATE UNIQUE INDEX IF NOT EXISTS "Alumno_usuario_key" ON "Alumno"("usuario");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Alumno_numeroMatricula_key" ON "Alumno"("numeroMatricula");
+CREATE UNIQUE INDEX IF NOT EXISTS "Alumno_numeroMatricula_key" ON "Alumno"("numeroMatricula");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Alumno_correoElectronico_key" ON "Alumno"("correoElectronico");
+CREATE UNIQUE INDEX IF NOT EXISTS "Alumno_correoElectronico_key" ON "Alumno"("correoElectronico");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Docente_usuario_key" ON "Docente"("usuario");
+CREATE UNIQUE INDEX IF NOT EXISTS "Docente_usuario_key" ON "Docente"("usuario");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Docente_matricula_key" ON "Docente"("matricula");
+CREATE UNIQUE INDEX IF NOT EXISTS "Docente_matricula_key" ON "Docente"("matricula");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Docente_correoElectronico_key" ON "Docente"("correoElectronico");
+CREATE UNIQUE INDEX IF NOT EXISTS "Docente_correoElectronico_key" ON "Docente"("correoElectronico");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Administrativo_usuario_key" ON "Administrativo"("usuario");
+CREATE UNIQUE INDEX IF NOT EXISTS "Administrativo_usuario_key" ON "Administrativo"("usuario");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Administrativo_correoElectronico_key" ON "Administrativo"("correoElectronico");
+CREATE UNIQUE INDEX IF NOT EXISTS "Administrativo_correoElectronico_key" ON "Administrativo"("correoElectronico");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_AlumnoToPadre_AB_unique" ON "_AlumnoToPadre"("A", "B");
+CREATE UNIQUE INDEX IF NOT EXISTS "_AlumnoToPadre_AB_unique" ON "_AlumnoToPadre"("A", "B");
 
 -- CreateIndex
-CREATE INDEX "_AlumnoToPadre_B_index" ON "_AlumnoToPadre"("B");
+CREATE INDEX IF NOT EXISTS "_AlumnoToPadre_B_index" ON "_AlumnoToPadre"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_AlumnoToMateria_AB_unique" ON "_AlumnoToMateria"("A", "B");
+CREATE UNIQUE INDEX IF NOT EXISTS "_AlumnoToMateria_AB_unique" ON "_AlumnoToMateria"("A", "B");
 
 -- CreateIndex
-CREATE INDEX "_AlumnoToMateria_B_index" ON "_AlumnoToMateria"("B");
+CREATE INDEX IF NOT EXISTS "_AlumnoToMateria_B_index" ON "_AlumnoToMateria"("B");
 
 -- AddForeignKey
-ALTER TABLE "Materia" ADD CONSTRAINT "Materia_docenteId_fkey" FOREIGN KEY ("docenteId") REFERENCES "Docente"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Materia" ADD CONSTRAINT IF NOT EXISTS "Materia_docenteId_fkey" FOREIGN KEY ("docenteId") REFERENCES "Docente"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_AlumnoToPadre" ADD CONSTRAINT "_AlumnoToPadre_A_fkey" FOREIGN KEY ("A") REFERENCES "Alumno"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_AlumnoToPadre" ADD CONSTRAINT IF NOT EXISTS "_AlumnoToPadre_A_fkey" FOREIGN KEY ("A") REFERENCES "Alumno"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_AlumnoToPadre" ADD CONSTRAINT "_AlumnoToPadre_B_fkey" FOREIGN KEY ("B") REFERENCES "Padre"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_AlumnoToPadre" ADD CONSTRAINT IF NOT EXISTS "_AlumnoToPadre_B_fkey" FOREIGN KEY ("B") REFERENCES "Padre"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_AlumnoToMateria" ADD CONSTRAINT "_AlumnoToMateria_A_fkey" FOREIGN KEY ("A") REFERENCES "Alumno"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_AlumnoToMateria" ADD CONSTRAINT IF NOT EXISTS "_AlumnoToMateria_A_fkey" FOREIGN KEY ("A") REFERENCES "Alumno"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_AlumnoToMateria" ADD CONSTRAINT "_AlumnoToMateria_B_fkey" FOREIGN KEY ("B") REFERENCES "Materia"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_AlumnoToMateria" ADD CONSTRAINT IF NOT EXISTS "_AlumnoToMateria_B_fkey" FOREIGN KEY ("B") REFERENCES "Materia"("id") ON DELETE CASCADE ON UPDATE CASCADE;
