@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import { sendUser } from '@/lib/actions';
 import { Curso, Materia } from "../../../../prisma/interfaces";
@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 export default function CreateUserForm({ materias, cursos }: { materias: Materia[], cursos: Curso[] }) {
   const initialState = { errors: null, message: null };
   const [state, dispatch] = useFormState(sendUser, initialState);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -45,6 +46,16 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
     if (isSubmitting && (state.errors || state.message)) {
       setProgress(100);
       setIsSubmitting(false);
+    }
+
+    if (state.message && !state.errors) {
+      formRef.current?.reset(); 
+      setFormData({
+        user: '',
+        curso: '',
+        materia: '',
+        hijos: ['']
+      });
     }
   }, [state.errors, state.message]);
 
@@ -82,9 +93,9 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
 
     await dispatch(formDataToSubmit);
   };
-  
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-8 m-6">
+    <form onSubmit={handleSubmit} ref={formRef} className="flex flex-col space-y-8 m-6">
       <div className="flex align-middle">
         <Label className="mr-2 mt-2 w-44" htmlFor="name">Nombre y apellido: *</Label>
         <Input id="name" name="name" required />
