@@ -7,28 +7,46 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import { sendUser } from '@/lib/actions';
 import { Curso, Materia } from "../../../../prisma/interfaces";
-import SearchablePeopleSelect from "./SearchableSelect";
-import SearchableSelect from "./SearchableSelect";
+import { Progress } from "@/components/ui/progress"; 
 
 export default function CreateUserForm({ materias, cursos }: { materias: Materia[], cursos: Curso[] }) {
-  //Utilizar server action
   const initialState = { errors: null, message: null };
   const [state, dispatch] = useFormState(sendUser, initialState);
 
-  const [hijos, setHijos] = useState([''])
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [hijos, setHijos] = useState(['']);
   const [formData, setFormData] = useState({
     user: '',
     curso: '',
     materia: '',
     hijos: hijos,
-  })
+  });
 
+  useEffect(() => {
+    if (isSubmitting) {
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev < 80) {
+            return prev + 5;
+          }
+          return prev;
+        });
+      }, 100);
+      return () => clearInterval(progressInterval);
+    }
+  }, [isSubmitting]);
 
-
+  useEffect(() => {
+    if (state.errors || state.message) {
+      setProgress(100);
+      setIsSubmitting(false);
+    }
+  }, [state.errors, state.message]);
 
   const handleUserChange = (value: string) => {
     setFormData(prevData => ({ ...prevData, user: value }))
@@ -52,8 +70,17 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
     setHijos(newHijos)
   }
 
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setProgress(10);
+  
+    const formDataToSubmit = new FormData(event.currentTarget as HTMLFormElement);
+    await dispatch(formDataToSubmit);
+  };  
+
   return (
-    <form action={dispatch} className="flex flex-col space-y-8 m-6">
+    <form onSubmit={handleSubmit} className="flex flex-col space-y-8 m-6">
       <div className="flex align-middle">
         <Label className="mr-2 mt-2 w-44" htmlFor="name">Nombre y apellido: *</Label>
         <Input id="name" name="name" required />
@@ -186,20 +213,31 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
             ))}
           </div>
         </div>
-      )
-      }
+      )}
 
-      <div className="flex align-center">
-        <p >(*) Campos OBLIGATORIOS</p>
-        <Button type="submit" className="w-60 ml-auto">Crear</Button>
-      </div>
-
-      {
-        state?.message && (
-          <p className={`mt-4 text-center ${state.errors ? 'text-red-600' : 'text-green-600'}`}>
+      {/* Mostrar mensajes de éxito y error */}
+      <div className="mt-4">
+        {state?.errors && (
+          <p className="text-red-600 text-center">
+            {state.errors}
+          </p>
+        )}
+        {state?.message && !state.errors && (
+          <p className="text-green-600 text-center">
             {state.message}
           </p>
         )}
+      </div>
+
+      <div className="flex align-center">
+        <p>(*) Campos OBLIGATORIOS</p>
+        <Button type="submit" className="w-60 ml-auto" disabled={isSubmitting}>
+          {isSubmitting ? "Cargando..." : "Crear"}
+        </Button>
+      </div>
+
+      {/* Barra de carga */}
+      {isSubmitting && <Progress className="mt-4" value={progress} />}
     </form >
-  )
+  );
 }

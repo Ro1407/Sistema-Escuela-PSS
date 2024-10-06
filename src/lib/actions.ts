@@ -109,11 +109,11 @@ async function sendAlumno(formData: FormData): Promise<State> {
 
 async function sendDocente(formData: FormData): Promise<State> {
   let docente: Docente | undefined;
-  const dni = formData.get('dni')?.toString() || ''
-  const correoElectronico = formData.get('email')?.toString() || ''
-  console.log(formData)
-  const cursos = formData.getAll('cursos[]').map(curso => curso.toString())
-  console.log(cursos)
+  const dni = formData.get('dni')?.toString() || '';
+  const correoElectronico = formData.get('email')?.toString() || '';
+
+  const cursos = formData.getAll('cursos[]').map(curso => curso.toString());
+
   docente = {
     nombre: getNombre(formData.get('name')?.toString()) || 'null',
     apellido: getApellido(formData.get('name')?.toString()) || 'null',
@@ -128,19 +128,22 @@ async function sendDocente(formData: FormData): Promise<State> {
       usuario: correoElectronico,
       password: dni
     }
+  };
+
+  const result = await registrarDocente(docente);
+  
+  if (result.success) {
+    return {
+      message: "Usuario Registrado",
+      errors: null
+    };
+  } else {
+    return {
+      message: "Error creando usuario",
+      errors: result.error || "Datos de docente invalidos"
+    };
   }
-
-  if (docente && await registrarDocente(docente))
-    return {
-      message: "Usuario Registrado"
-    }
-  else
-    return {
-      errors: "datos de docente invalidos / db",
-      message: "Error creando usuario"
-    }
 }
-
 
 async function sendPadre(formData: FormData): Promise<State> {
   let padre: Padre | undefined;
@@ -187,14 +190,17 @@ async function registrarAlumno(alumno: Alumno) {
 }
 
 
-async function registrarDocente(docente: Docente) {
+async function registrarDocente(docente: Docente): Promise<{ success: boolean, error?: string }> {
   try {
-    await createDocente(docente)
-    return true;
-  }
-  catch (e) {
-    console.log(e)
-    return false
+    await createDocente(docente);
+    return { success: true };
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message);
+      return { success: false, error: e.message };
+    } else {
+      return { success: false, error: "Ocurrió un error desconocido" };
+    }
   }
 }
 

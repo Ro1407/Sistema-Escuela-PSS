@@ -1,38 +1,51 @@
 import prisma from '../prismaClientInitialization'
 import { Docente } from '../interfaces'
-import { Rol } from '@prisma/client'; 
+import { Rol } from '@prisma/client';
 
-export async function createDocente(data: Omit<Docente, 'id' | 'usuario' | 'cursos'> &
-    { usuario: { usuario: string; password: string }, cursosIds: string[]}): Promise<Docente> {
+export async function createDocente(data: Omit<Docente, 'id' | 'usuario' | 'cursos'> & { usuario: { usuario: string; password: string }, cursosIds: string[] }): Promise<Docente | null> {
+    try {
 
-    return prisma.docente.create({
-        data: {
-            nombre: data.nombre,
-            apellido: data.apellido,
-            dni: data.dni,
-            direccion: data.direccion,
-            matricula: data.matricula,
-            numeroTelefono: data.numeroTelefono,
-            correoElectronico: data.correoElectronico,
-            cursos: data.cursosIds ? {connect: data.cursosIds.map(id => ({id}))} : undefined,
-            usuario: {
-                create: {
-                    usuario: data.usuario.usuario,
-                    password: data.usuario.password,
-                    rol: Rol.DOCENTE
-                }
-            },
-            materia: {
-                connect: { id: data.materiaId }
-            },
-        },
-        include: {
-            usuario: true,
-            cursos: true,
-            materia: true,
+        const materiaConDocente = await prisma.materia.findUnique({
+            where: { id: data.materiaId },
+            select: { docente: true }
+        });
+
+        if (materiaConDocente?.docente) {
+            throw new Error('La materia ya tiene un docente asignado');
         }
-    });
+
+        return await prisma.docente.create({
+            data: {
+                nombre: data.nombre,
+                apellido: data.apellido,
+                dni: data.dni,
+                direccion: data.direccion,
+                matricula: data.matricula,
+                numeroTelefono: data.numeroTelefono,
+                correoElectronico: data.correoElectronico,
+                cursos: data.cursosIds ? { connect: data.cursosIds.map(id => ({ id })) } : undefined,
+                usuario: {
+                    create: {
+                        usuario: data.usuario.usuario,
+                        password: data.usuario.password,
+                        rol: Rol.DOCENTE,
+                    }
+                },
+                materia: {
+                    connect: { id: data.materiaId }
+                },
+            },
+            include: {
+                usuario: true,
+                cursos: true,
+                materia: true,
+            }
+        });
+    } catch (e) {
+        throw new Error(e instanceof Error ? e.message : 'Error en la base de datos al registrar el docente');
+    }
 }
+
 export async function getDocente(id: string): Promise<Docente | null> {
     return prisma.docente.findUnique({
         where: { id },
@@ -52,7 +65,7 @@ export async function getAllDocentes(): Promise<Docente[]> {
     });
 }
 
-export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string }}): Promise<Docente> {
+export async function updateDocente(id: string, data: Partial<Omit<Docente, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string } }): Promise<Docente> {
     const updateData: any = { ...data };
 
     if (data.usuario) {
