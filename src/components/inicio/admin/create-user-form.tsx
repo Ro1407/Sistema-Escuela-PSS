@@ -42,7 +42,7 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
   }, [isSubmitting]);
 
   useEffect(() => {
-    if (state.errors || state.message) {
+    if (isSubmitting && (state.errors || state.message)) {
       setProgress(100);
       setIsSubmitting(false);
     }
@@ -74,11 +74,15 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
     event.preventDefault();
     setIsSubmitting(true);
     setProgress(10);
-  
-    const formDataToSubmit = new FormData(event.currentTarget as HTMLFormElement);
-    await dispatch(formDataToSubmit);
-  };  
 
+    state.errors = null;
+    state.message = null;
+
+    const formDataToSubmit = new FormData(event.currentTarget as HTMLFormElement);
+
+    await dispatch(formDataToSubmit);
+  };
+  
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-8 m-6">
       <div className="flex align-middle">
