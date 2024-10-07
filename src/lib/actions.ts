@@ -2,12 +2,13 @@
 
 import { getUser } from '../../prisma/services/autenticacion.service';
 import { createAlumno } from "../../prisma/services/alumno.service";
-import { Docente, State } from "./definitions";
+import { Administrador, Docente, State } from "./definitions";
 import { Alumno, Padre } from "./definitions"
 import { createPadre } from '../../prisma/services/padre.service';
 import { createDocente } from '../../prisma/services/docente.service';
 import { createSession, deleteSession, getSession } from './session';
 import { redirect } from 'next/navigation';
+import { createAdministrativo } from '../../prisma/services/administrativo.service';
 
 
 export type AuthState = {
@@ -71,6 +72,11 @@ export async function sendUser(prevState: State, formData: FormData): Promise<St
     case 'padre':
       state = await sendPadre(formData);
       break;
+    case 'administrador':
+      state = await sendAdministrador(formData);
+      break;
+    default:
+      break;
   }
   return state;
 }
@@ -100,7 +106,7 @@ async function sendAlumno(formData: FormData): Promise<State> {
     }
   else
     return {
-      errors: "datos de alumno invalidos / db",
+      errors: "Datos de alumno inválidos / db",
       message: "Error creando usuario"
     }
 
@@ -177,6 +183,33 @@ async function sendPadre(formData: FormData): Promise<State> {
   }
 }
 
+async function sendAdministrador(formData: FormData): Promise<State> {
+  let administrador: Administrador | undefined;
+  const dni = formData.get('dni')?.toString() || ''
+  const correoElectronico = formData.get('email')?.toString() || ''
+  administrador = {
+    nombre: getNombre(formData.get('name')?.toString()) || 'null',
+    apellido: getApellido(formData.get('name')?.toString()) || 'null',
+    direccion: formData.get('address')?.toString() || 'null',
+    numeroTelefono: formData.get('phone')?.toString() || 'null',
+    correoElectronico: correoElectronico,
+    dni: dni,
+    usuario: {
+      usuario: correoElectronico,
+      password: dni
+    }
+  }
+  if (administrador && await registrarAdministrador(administrador))
+    return {
+      message: "Usuario Registrado"
+    }
+    else
+      return {
+        errors: "Datos de administrador inválidos / db",
+        message: "Error creando usuario"
+      }
+}
+  
 
 async function registrarAlumno(alumno: Alumno) {
   try {
@@ -218,6 +251,20 @@ async function registrarPadre(padre : Padre){
 }
 
 */
+
+async function registrarAdministrador(administrador: Administrador): Promise<{ success: boolean, error?: string }> {
+  try {
+    await createAdministrativo(administrador);
+    return { success: true };
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message);
+      return { success: false, error: e.message };
+    } else {
+      return { success: false, error: "Ocurrio un error desconocido" };
+    }
+  }
+}
 
 function getNombre(fullName: string | undefined) {
   if (!fullName) return null;

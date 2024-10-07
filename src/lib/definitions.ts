@@ -75,3 +75,16 @@ export interface Padre {
   correoElectronico: string;
   hijos: string[]
 }
+
+export interface Administrador {
+  usuario: {
+    usuario: string,
+    password: string
+  }
+  nombre: string;
+  apellido: string;
+  dni: string;
+  direccion: string;
+  numeroTelefono: string;
+  correoElectronico: string;
+}
