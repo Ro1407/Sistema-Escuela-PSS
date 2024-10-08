@@ -1,6 +1,9 @@
 
 export type State = {
-  errors?: string | null;
+  errors?: {
+    description?: string | null 
+    childField?: Record<number, string> | null;
+  } | null;
   message?: string | null;
 };
 
@@ -73,7 +76,8 @@ export interface Padre {
   direccion: string;
   numeroTelefono: string;
   correoElectronico: string;
-  hijos: string[]
+  dni: string;
+  hijosIds: string[]
 }
 
 export interface Administrador {
