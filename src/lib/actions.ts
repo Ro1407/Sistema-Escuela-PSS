@@ -1,7 +1,7 @@
 'use server'
 
 import { getUser } from '../../prisma/services/autenticacion.service';
-import { createAlumno } from "../../prisma/services/alumno.service";
+import { createAlumno, getAlumnosByDNI, getAlumnosByName } from "../../prisma/services/alumno.service";
 import { Administrador, Docente, State } from "./definitions";
 import { Alumno, Padre } from "./definitions"
 import { createPadre } from '../../prisma/services/padre.service';
@@ -61,7 +61,7 @@ export async function logout() {
 
 export async function sendUser(prevState: State, formData: FormData): Promise<State> {
   const userTy = formData.get('userType')
-  let state: State = { errors: "error de formulario", message: "error recuperando formulario" }
+  let state: State = { errors: { description: "error de formulario"}, message: "error recuperando formulario" }
   switch (userTy) {
     case 'alumno':
       state = await sendAlumno(formData);
@@ -106,7 +106,7 @@ async function sendAlumno(formData: FormData): Promise<State> {
     }
   else
     return {
-      errors: "Datos de alumno inválidos / db",
+      errors: { description: "Datos de alumno inválidos / db"},
       message: "Error creando usuario"
     }
 
@@ -117,8 +117,6 @@ async function sendDocente(formData: FormData): Promise<State> {
   let docente: Docente | undefined;
   const dni = formData.get('dni')?.toString() || '';
   const correoElectronico = formData.get('email')?.toString() || '';
-
-  const cursos = formData.getAll('cursos[]').map(curso => curso.toString());
 
   docente = {
     nombre: getNombre(formData.get('name')?.toString()) || 'null',
@@ -146,7 +144,9 @@ async function sendDocente(formData: FormData): Promise<State> {
   } else {
     return {
       message: "Error creando usuario",
-      errors: result.error || "Datos de docente invalidos"
+      errors: { 
+        description:  result.error || "Datos de docente invalidos" 
+      },
     };
   }
 }
@@ -154,19 +154,47 @@ async function sendDocente(formData: FormData): Promise<State> {
 async function sendPadre(formData: FormData): Promise<State> {
   let padre: Padre | undefined;
   const dni = formData.get('dni')?.toString() || ''
+  const correoElectronico = formData.get('email')?.toString() || ''
+
+  const dnisHijos = formData.getAll('hijos[]').map(hijo => hijo.toString());
+
+  const hijosExistentes = await getAlumnosByDNI(dnisHijos);
+  const hijosExistentesDnis = hijosExistentes.map(hijo => hijo.dni);
+
+  // Mapear errores a cada índice correspondiente
+  const childFieldErrors: Record<number, string> = dnisHijos.reduce((acc, dni, index) => {
+    if (!hijosExistentesDnis.includes(dni)) {
+      acc[index] = `Alumno no encontrado`;
+    }
+    return acc;
+  }, {} as Record<number, string>);
+
+  // Si hay errores, retornarlos
+  if (Object.keys(childFieldErrors).length > 0) {
+    return {
+      errors: {
+        childField: childFieldErrors,
+        description: null  
+      },
+      message: "Error creando usuario"
+    };
+  }
+
+  const hijosIds = hijosExistentes.map(hijo => hijo.id);
+
   padre = {
     nombre: getNombre(formData.get('name')?.toString()) || 'null',
     apellido: getApellido(formData.get('name')?.toString()) || 'null',
     direccion: formData.get('address')?.toString() || 'null',
     numeroTelefono: formData.get('phone')?.toString() || 'null',
-    correoElectronico: formData.get('email')?.toString() || 'null',
+    correoElectronico: correoElectronico,
+    dni: dni,
     usuario: {
       usuario: dni,
       password: dni
     },
-    hijos: formData.getAll('hijos[]').map(hijo => hijo.toString()) //id para identificar a los hijos en la BD
+    hijosIds: hijosIds
   }
-  /*
   
   if(padre && await registrarPadre(padre))
   return {
@@ -174,13 +202,11 @@ async function sendPadre(formData: FormData): Promise<State> {
     }
   else
   return {
-      errors: "datos de alumno invalidos / db",
-      message: "Error creando usuario"
+      errors: {
+        description: "Datos de padre inválidos / db"
+      },
+      message: "Error creando el usuario"
     }
-      */
-  return {
-    message: "Usuario Registrado"
-  }
 }
 
 async function sendAdministrador(formData: FormData): Promise<State> {
@@ -205,8 +231,8 @@ async function sendAdministrador(formData: FormData): Promise<State> {
     }
     else
       return {
-        errors: "Datos de administrador inválidos / db",
-        message: "Error creando usuario"
+        errors: {description: "Datos de administrador inválidos / db"},
+        message: "Error creando el usuario"
       }
 }
   
@@ -237,8 +263,6 @@ async function registrarDocente(docente: Docente): Promise<{ success: boolean, e
   }
 }
 
-
-/*
 async function registrarPadre(padre : Padre){
   try{
       await createPadre(padre)
@@ -249,8 +273,6 @@ async function registrarPadre(padre : Padre){
       return false
   }
 }
-
-*/
 
 async function registrarAdministrador(administrador: Administrador): Promise<{ success: boolean, error?: string }> {
   try {

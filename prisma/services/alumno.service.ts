@@ -41,6 +41,26 @@ export async function getAlumno(id: string): Promise<Alumno | null> {
     });
 }
 
+export async function getAlumnosByName(nombres: string[]): Promise<Alumno[]> {
+    return prisma.alumno.findMany({
+        where: {
+            nombre: {
+                in: nombres
+            }
+        }
+    });
+}
+
+export async function getAlumnosByDNI(dnis: string[]): Promise<Alumno[]> {
+    return prisma.alumno.findMany({
+        where: {
+            dni: {
+                in: dnis
+            }
+        }
+    });
+}
+
 export async function getAllAlumnos(): Promise<Alumno[]> {
     const alumnos = await prisma.alumno.findMany({
         include: {

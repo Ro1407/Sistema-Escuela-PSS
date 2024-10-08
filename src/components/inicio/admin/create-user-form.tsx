@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import { sendUser } from '@/lib/actions';
 import { Curso, Materia } from "../../../../prisma/interfaces";
-import { Progress } from "@/components/ui/progress"; 
+import { Progress } from "@/components/ui/progress";
 
 export default function CreateUserForm({ materias, cursos }: { materias: Materia[], cursos: Curso[] }) {
   const initialState = { errors: null, message: null };
@@ -49,7 +49,7 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
     }
 
     if (state.message && !state.errors) {
-      formRef.current?.reset(); 
+      formRef.current?.reset();
       setFormData({
         user: '',
         curso: '',
@@ -202,28 +202,37 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
 
       {formData.user === 'padre' && (
         <div className="flex ml-auto">
-          <Label className="mr-4 mt-2 w-30">Hijo/s:</Label>
+          <div className="flex flex-col space-y-2">
+            <Label className="mr-4 mt-2 w-30">Hijo/s:</Label>
+            <span className="text-xs mr-2">(Ingrese su DNI)</span>
+          </div>
           <div className="flex flex-col space-y-2">
             {hijos.map((hijo, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <Input
-                  id={`hijo-${index}`}
-                  name="hijos[]"
-                  value={hijo}
-                  onChange={(e) => handleHijoChange(index, e.target.value)}
-                  placeholder={`Hijo ${index + 1}`}
-                />
-                {index === hijos.length - 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleAddHijo}
-                  >
-                    <PlusCircle className="h-4 w-4" />
-                  </Button>
+              <div key={index} className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id={`hijo-${index}`}
+                    name="hijos[]"
+                    type="number"
+                    onChange={(e) => handleHijoChange(index, e.target.value)}
+                    placeholder={`DNI hijo ${index + 1}`}
+                  />
+                  {index === hijos.length - 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleAddHijo}
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                {state?.errors?.childField?.[index] && (
+                  <p className="text-red-600 text-xs">
+                    {state.errors.childField[index]}
+                  </p>
                 )}
-
               </div>
             ))}
           </div>
@@ -234,7 +243,7 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
       <div className="mt-4">
         {state?.errors && (
           <p className="text-red-600 text-center">
-            {state.errors}
+            {state.message ? state.message : state.errors.description}
           </p>
         )}
         {state?.message && !state.errors && (
