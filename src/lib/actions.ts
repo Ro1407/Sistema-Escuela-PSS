@@ -237,6 +237,15 @@ async function sendAdministrador(formData: FormData): Promise<State> {
 }
   
 
+export async function sendCurso(prevState: State, formData: FormData): Promise<State> {
+  return new Promise((resolve, reject) => {
+    resolve({
+      message: "Curso creado"
+    })
+  })
+}
+
+
 async function registrarAlumno(alumno: Alumno) {
   try {
     await createAlumno(alumno)
