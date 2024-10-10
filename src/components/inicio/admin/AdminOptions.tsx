@@ -28,12 +28,20 @@ export default function AdminOptions() {
         Modificar Usuario
       </Link>
       <Link
-        href="/inicio/admin/cursado"
+        href="/inicio/admin/crear_cursado"
         className={clsx(
           "w-full gap-3 rounded-lg px-3 py-2 text-white text-sm",
-          pathname === '/inicio/admin/cursado' ? 'bg-blue-700 text-white' : 'bg-gray-900'
+          pathname === '/inicio/admin/crear_cursado' ? 'bg-blue-700 text-white' : 'bg-gray-900'
         )}>
         Crear Cursado
+      </Link>
+      <Link
+        href="/inicio/admin/modificar_cursado"
+        className={clsx(
+          "w-full gap-3 rounded-lg px-3 py-2 text-white text-sm",
+          pathname === '/inicio/admin/modificar_cursado' ? 'bg-blue-700 text-white' : 'bg-gray-900'
+        )}>
+        Modificar Cursado
       </Link>
     </div>
   )
