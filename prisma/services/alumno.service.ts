@@ -1,6 +1,6 @@
 import prisma from '../prismaClientInitialization';
-import {Alumno} from '../interfaces';
-import {Rol} from '@prisma/client';
+import { Alumno, Tipo } from '@prisma/client'; 
+import { Rol } from '@prisma/client';
 
 export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario'> & { usuario: { usuario: string; password: string } }): Promise<Alumno> {
     return prisma.alumno.create({
@@ -27,16 +27,24 @@ export async function createAlumno(data: Omit<Alumno, 'id' | 'usuario'> & { usua
         include: {
             usuario: true,
             curso: true,
-            padre: true
+            padre: true,
+            amonestaciones: true, 
+            asistencia: true,
+            notas: true,
+            boletin: true
         }
     });
 }
 
 export async function getAlumno(id: string): Promise<Alumno | null> {
     return prisma.alumno.findUnique({
-        where: {id},
+        where: { id },
         include: {
-            usuario: true
+            usuario: true,
+            amonestaciones: true,
+            asistencia: true,
+            notas: true,
+            boletin: true
         }
     });
 }
