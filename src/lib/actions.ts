@@ -61,6 +61,10 @@ export async function sendUser(prevState: State, formData: FormData): Promise<St
   const userTy = formData.get('userType')
   let state: State = { errors: { description: "error de formulario"}, message: "error recuperando formulario" }
   switch (userTy) {
+    case 'ninguno':
+      state = {
+        errors: { description: "Debe seleccionar un tipo de usuario" }, message: "Debe seleccionar un tipo de usuario"}
+      break;
     case 'alumno':
       state = await sendAlumno(formData);
       break;
