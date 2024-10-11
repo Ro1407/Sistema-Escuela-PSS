@@ -20,7 +20,7 @@ async function main() {
     await casosPadre()
     await casosAdministrativos() */
     //await casosInterfazCrearDocente()
-    await casosInterfazCrearPadre()
+  //  await casosInterfazCrearPadre()
 
 }
 
@@ -36,7 +36,7 @@ main()
 
 
 async function casosDocente(){
-
+/*
     const nuevoDocente = await docenteService.createDocente({
         nombre: 'Juan',
         apellido: 'Pérez',
@@ -55,7 +55,7 @@ async function casosDocente(){
     console.log('Nuevo docente creado:', nuevoDocente);
 
     // Obtener un docente por ID
-    const docente = await docenteService.getDocente(nuevoDocente.id);
+    const docente = await docenteService.getDocente(nuevoDocente!.id);
     console.log('Docente encontrado:', docente);
 
     // Obtener todos los docentes
@@ -63,7 +63,7 @@ async function casosDocente(){
     console.log('Lista de todos los docentes:', todosLosDocentes);
 
     // Actualizar un docente
-    const docenteActualizado = await docenteService.updateDocente(nuevoDocente.id, {
+    const docenteActualizado = await docenteService.updateDocente(nuevoDocente!.id, {
         apellido: 'Gómez',
         usuario: {
             password: 'nuevaPassword456',
@@ -72,13 +72,13 @@ async function casosDocente(){
     console.log('Docente actualizado:', docenteActualizado);
 
     // Obtener el docente actualizado
-    const docenteDespuesActualizacion = await docenteService.getDocente(nuevoDocente.id);
-    console.log('Docente después de la actualización:', docenteDespuesActualizacion);
+    const docenteDespuesActualizacion = await docenteService.getDocente(nuevoDocente!.id);
+    console.log('Docente después de la actualización:', docenteDespuesActualizacion); */
 }
 
 
 async function casosAlumno() {
-
+/*
     const alumno = await alumnoService.createAlumno({
         nombre: 'Juan',
         apellido: 'Pérez',
@@ -111,11 +111,11 @@ async function casosAlumno() {
     console.log('Alumno actualizado:', alumnoActualizado);
 
     const alumnoDespuesActualizacion = await alumnoService.getAlumno(alumnoActualizado.id);
-    console.log('Alumno después de la actualización:', alumnoDespuesActualizacion);
+    console.log('Alumno después de la actualización:', alumnoDespuesActualizacion); */
 }
 
 async function casosMateria(){
-    const materia = await materiaService.createMateria({
+   /*  const materia = await materiaService.createMateria({
         nombre: 'Matemáticas',
         docenteId: '8a931ccb-6b76-4238-9002-9e2804f09bf4',
         cursosIds: ['c0b40a20-8d41-464b-9cd9-01f52005e3a3'],
@@ -127,21 +127,21 @@ async function casosMateria(){
     console.log('Materia encontrada:', materia2);
 
     const todasLasMaterias = await materiaService.getAllMaterias();
-    console.log('Lista de todas las materias:', todasLasMaterias);
+    console.log('Lista de todas las materias:', todasLasMaterias); */
 
     /* NOTA: No se puede cambiar docente porque en la entidad docente el campo materia es obligatorio y la
     relación es uno a uno.*/
-
+/*
     const materiaActualizada = await materiaService.updateMateria('629dc67b-409c-48b0-97b3-dfd2ed6f9c6e', {
         nombre: 'Historia',
     });
     console.log('Materia actualizada:', materiaActualizada);
 
-    const materiaDespuesActualizacion = await materiaService.getMateria(materiaActualizada.id);
+    const materiaDespuesActualizacion = await materiaService.getMateria(materiaActualizada.id); */
 }
 
 async function casosMateriasSinDocentes(){
-    let cursos = ['c0b40a20-8d41-464b-9cd9-01f52005e3a3'];
+   /* let cursos = ['c0b40a20-8d41-464b-9cd9-01f52005e3a3'];
 
     let materiasSinDocentes = await materiaService.getNombreIDMateriasSinDocente(cursos);
     console.log('Materias sin docente 1B (matemáticas):', materiasSinDocentes);
@@ -156,12 +156,12 @@ async function casosMateriasSinDocentes(){
 
     cursos = ['c0b40a20-8d41-464b-9cd9-01f52005e3a3', 'bd69821a-9c6e-491b-bc32-3267f106f985', 'c024e385-4b94-4c6f-b3f8-54e78dcef89e', 'e9647674-972a-4a97-8b92-0246b564e41a'];
     materiasSinDocentes = await materiaService.getNombreIDMateriasSinDocente(cursos);
-    console.log('Materias sin docente 1B, 1A, 2A y 2B (politica):', materiasSinDocentes); //politica y literatura antes de controlar interfaz, bien
+    console.log('Materias sin docente 1B, 1A, 2A y 2B (politica):', materiasSinDocentes); //politica y literatura antes de controlar interfaz, bien */
 }
 
 
 async function casosPadre(){
-    const padre = await padreService.createPadre({
+    /* const padre = await padreService.createPadre({
         nombre: 'Juan',
         apellido: 'Pérez',
         dni: '12738000',
@@ -186,11 +186,11 @@ async function casosPadre(){
         apellido: 'Gómez',
         usuario: { password: 'aaa'} });
 
-    console.log('Padre actualizado:', padreActualizado);
+    console.log('Padre actualizado:', padreActualizado); */
 }
 
 async function casosAdministrativos(){
-    const administrativo = await administrativoService.createAdministrativo({
+   /*  const administrativo = await administrativoService.createAdministrativo({
         nombre: 'Ana',
         apellido: 'López',
         dni: '12738700',
@@ -213,7 +213,7 @@ async function casosAdministrativos(){
     const administrativoActualizado = await administrativoService.updateAdministrativo(administrativo.id, {
         apellido: 'Gómez',
         usuario: { password: 'nuevaPassword456' }});
-    console.log('Administrativo actualizado:', administrativoActualizado);
+    console.log('Administrativo actualizado:', administrativoActualizado); */
 }
 
 
@@ -221,13 +221,13 @@ async function casosInterfazCrearDocente() {
 
 
     /* Usar cursoService.getAllCursosNombreID() para obtener nombre y ID de todos los cursos */
-    const todosLosCursos = await cursoService.getAllCursosNombreID();
-    console.log('Cursos:', todosLosCursos);
+ /*   const todosLosCursos = await cursoService.getAllCursosNombreID();
+    console.log('Cursos:', todosLosCursos); */
 
     /* Usar getNombreIDMateriasSinDocente(cursoIds: string[]) de materia service para obtener todas las materias que se le podrían asignar al docente en función de los cursos
     se chequea en la interfaz */
 
-   const id_literatura = '487802c6-d201-4947-b449-df60b4dd1022';
+   // const id_literatura = '487802c6-d201-4947-b449-df60b4dd1022';
    //Escenario: se eligen los cursos 1A, 1B, 2A y 2B con materia literatura
 
     /*
@@ -257,7 +257,7 @@ async function casosInterfazCrearDocente() {
 
     //Escenario: se elige el curso 3A con materia naturales
 
-    const id_naturales = '53310958-102b-40ea-9996-a00d987d8adf';
+   /* const id_naturales = '53310958-102b-40ea-9996-a00d987d8adf';
     const id_3A = 'f9af1024-f291-437d-b797-7d1c47330e03';
 
     const docente = await docenteService.createDocente({
@@ -304,7 +304,7 @@ async function casosInterfazCrearPadre(){
     console.log('Nuevo padre creado:', padre);
 
     alumnosSinPadre = await alumnoService.getAlumnosSinPadre();
-    console.log('Alumnos sin padre:', alumnosSinPadre);
+    console.log('Alumnos sin padre:', alumnosSinPadre); */
 }
 
 
