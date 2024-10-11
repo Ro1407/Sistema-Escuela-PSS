@@ -13,7 +13,7 @@ export async function createMateria(data: Omit<Materia, 'id' | 'docente' | 'curs
         },
         include: {
             docente: true,
-            cursos: true
+            cursos: true,
         }
     });
 }

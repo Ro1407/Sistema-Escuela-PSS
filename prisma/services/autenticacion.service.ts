@@ -3,14 +3,21 @@ import {Usuario} from '../interfaces';
 
 export async function getUser(username: string): Promise<Usuario | null> {
     return prisma.usuario.findUnique({
-        where: {usuario: username},
+        where: { usuario: username },
         include: {
             padre: {
-                include: {hijos: true}
+                include: { hijos: true }
             },
-            alumno: true,
+            alumno: {
+                include: {
+                    boletin: true,
+                    amonestaciones: true,
+                    asistencia: true,
+                    notas: true
+                }
+            },
             docente: {
-                include: {cursos: true}
+                include: { cursos: true }
             },
             administrativo: true
         },

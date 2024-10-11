@@ -1,5 +1,5 @@
 // TypeScript interfaces for Prisma models
-import { Usuario as PrismaUsuario } from '@prisma/client';
+import { Usuario as PrismaUsuario, Tipo as PrismaTipo, TipoAsistencia as PrismaTipoAsistencia, Periodo as PrismaPeriodo } from '@prisma/client';
 
 export interface Usuario extends PrismaUsuario {
     padre?: Padre | null;
@@ -30,6 +30,10 @@ export interface Alumno {
     correoElectronico: string;
     padreId?: string | null; 
     cursoId: string;
+    amonestaciones?: Amonestacion[];
+    asistencia?: Asistencia[];
+    notas?: Nota[];
+    boletin?: Boletin[];
 }
 
 export interface Docente {
@@ -60,6 +64,7 @@ export interface Materia {
     nombre: string;
     docente?: Docente | null;
     cursos?: Curso[];
+    notas?: Nota[];
 }
 
 export interface Curso {
@@ -68,4 +73,36 @@ export interface Curso {
     materias?: Materia[];
     docentes?: Docente[];
     alumnos?: Alumno[];
+}
+
+export interface Amonestacion {
+    id: string;
+    tipo: PrismaTipo;
+    fecha: Date;
+    descripcion: string;
+    firma: boolean;
+    alumnoId: string;
+}
+
+export interface Asistencia {
+    id: string;
+    fecha: Date;
+    tipo_asistencia: PrismaTipoAsistencia;
+    alumnoId: string;
+}
+
+export interface Nota {
+    id: string;
+    calificacion: string;
+    alumnoId: string;
+    materiaId: string;
+    boletinId: string;
+}
+
+export interface Boletin {
+    id: string;
+    periodo: PrismaPeriodo;
+    anio: string;
+    alumnoId: string;
+    notas?: Nota[];
 }
