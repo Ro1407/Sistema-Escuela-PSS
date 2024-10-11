@@ -1,4 +1,4 @@
-import CreateCursoForm from "@/components/inicio/admin/crear_cursado/create-curso-form";
+import CreateCursoForm from "@/components/inicio/admin/create-curso-form";
 
  
  export default function InicioAdminCrearCursadoPage() {

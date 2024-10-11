@@ -1,4 +1,16 @@
+import { Curso, Materia } from '../interfaces';
 import prisma from '../prismaClientInitialization';
+
+export async function createCurso(data: Omit<Curso, 'id' | 'materias'> & { materiasIds: string[] }): Promise<Curso> {
+    return prisma.curso.create({
+        data: {
+            nombre: data.nombre,
+            materias: {
+                connect: data.materiasIds.map(id => ({id})) 
+            }
+        }
+    });
+}
 
 export async function getAllCursosNombreID(){
     return prisma.curso.findMany(
@@ -6,4 +18,22 @@ export async function getAllCursosNombreID(){
             id: true,
             nombre: true,}
         });
+}
+
+
+export async function getCursoConMaterias(id: string): Promise<Curso | null> {
+    return prisma.curso.findUnique({
+        where: {id},
+        include: {
+            materias: true
+        }
+    });
+}
+
+export async function getAllCursosConMaterias(): Promise<Curso[]> {
+    return prisma.curso.findMany({
+        include: {
+            materias: true
+        }
+    });
 }

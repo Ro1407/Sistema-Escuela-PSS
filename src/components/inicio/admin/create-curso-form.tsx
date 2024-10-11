@@ -19,15 +19,9 @@ export default function CreateCursoForm() {
     setMaterias([...materias, ''])
   }
 
-  const handleMateriaChange = (index: number, value: string) => {
-    const newMaterias = [...materias]
-    newMaterias[index] = value
-    setMaterias(newMaterias)
-  }
-
   return (
 
-    <form className="flex flex-col w-full flex-grow overflow-y-auto">
+    <form action={dispatch} className="flex flex-col w-full flex-grow overflow-y-auto">
       <div className="flex flex-col space-y-8 w-full md:w-1/2 mx-auto">
         <div className="flex space-x-2">
           <Label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -41,6 +35,7 @@ export default function CreateCursoForm() {
               type="text"
               name="name"
               id="name"
+              required
               className="w-20"
               placeholder="1A"
             />
@@ -48,7 +43,7 @@ export default function CreateCursoForm() {
         </div>
         <div className="border px-10 pb-4 border-gray-300 border-dashed rounded-2xl">
           <div className="text-center mt-4 mb-6">
-            <Label className="w-30 font-bold">Materias:</Label>
+            <Label className="w-30 font-bold">Materias: *</Label>
           </div>
           <div className="flex flex-col space-y-2">
             {materias.map((materia, index) => (
@@ -62,7 +57,6 @@ export default function CreateCursoForm() {
                       id={`materia-${index}`}
                       name="materias[]"
                       type="text"
-                      onChange={(e) => handleMateriaChange(index, e.target.value)}
                       placeholder={`Matemática`}
                     />
                   </div>
@@ -78,15 +72,24 @@ export default function CreateCursoForm() {
                     </Button>
                   )}
                 </div>
-                {state?.errors?.childField?.[index] && (
-                  <p className="text-red-600 text-xs">
-                    {state.errors.childField[index]}
-                  </p>
-                )}
               </div>
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Mostrar mensajes de éxito y error */}
+      <div className="mt-4">
+        {state?.errors && (
+          <p className="text-red-600 text-center">
+            {state.message ? state.message : state.errors.description}
+          </p>
+        )}
+        {state?.message && !state.errors && (
+          <p className="text-green-600 text-center">
+            {state.message}
+          </p>
+        )}
       </div>
 
       <div className="flex align-center mt-auto">

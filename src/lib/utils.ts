@@ -13,3 +13,21 @@ export function formatearFecha(fecha: Date) {
   const fechaFormateada = `${dia}/${mes}/${año}`;
   return fechaFormateada
 }
+
+export function normalizeString(str: string) {
+  return str
+    .toLowerCase()
+    .normalize('NFD') // Descomponer caracteres acentuados
+    .replace(/[\u0300-\u036f]/g, '') // Quitar los acentos
+    .replace(/[^a-zA-Z0-9\s]/g, '') // Opcional: quitar caracteres no alfanuméricos
+    .trim(); // Quitar espacios en blanco
+}
+
+export function capitalizeInitials(str: string) {
+  return str
+    .toLowerCase() // Asegurar que todo el texto esté en minúsculas
+    .split(' ') // Dividir la cadena en palabras por los espacios
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar la primera letra de cada palabra
+    .join(' '); // Volver a unir las palabras con espacios
+}
+
