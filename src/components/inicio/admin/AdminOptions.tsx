@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,7 +22,7 @@ export default function AdminOptions() {
         href="/inicio/admin/modificar_usuario"
         className={clsx(
           "w-full gap-3 rounded-lg px-3 py-2 text-white text-sm",
-          pathname === '/inicio/admin/modificar' ? 'bg-blue-700 text-white' : 'bg-gray-900'
+          pathname === '/inicio/admin/modificar_usuario' ? 'bg-blue-700 text-white' : 'bg-gray-900'
         )}>
         Modificar Usuario
       </Link>
