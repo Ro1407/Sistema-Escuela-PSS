@@ -1,7 +1,7 @@
 'use server'
 
 import { getUser } from '../../prisma/services/autenticacion.service';
-import { createAlumno, getAlumnosByDNI, getAlumnosByName } from "../../prisma/services/alumno.service";
+import { createAlumno, getAlumnosByDNI } from "../../prisma/services/alumno.service";
 import { Administrador, Docente, State } from "./definitions";
 import { Alumno, Padre } from "./definitions"
 import { createPadre } from '../../prisma/services/padre.service';
@@ -26,12 +26,8 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
   try {
     const user = await getUser(username);
 
-    if (!user) {
-      return { error: 'El usuario ingresado no está registrado', redirectPath: null };
-    }
-
-    if (user.password !== password) {
-      return { error: 'La contraseña ingresada no se corresponde con el usuario', redirectPath: null };
+    if (!user || user.password !== password) {
+      return { error: 'El usuario o contraseña ingresados son incorrectos', redirectPath: null };
     }
 
     let redirectPath = '';
@@ -53,12 +49,11 @@ export async function validateUser(prevState: AuthState, formData: FormData): Pr
 }
 
 export async function fetchUserSession() {
-  const session = await getSession()
-  return session
+  return await getSession()
 }
 
 export async function logout() {
-  await deleteSession()
+  deleteSession()
   redirect('/login')
 }
 
