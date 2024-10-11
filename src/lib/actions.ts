@@ -9,6 +9,9 @@ import { createDocente } from '../../prisma/services/docente.service';
 import { createSession, deleteSession, getSession } from './session';
 import { redirect } from 'next/navigation';
 import { createAdministrativo } from '../../prisma/services/administrativo.service';
+import { capitalizeInitials, normalizeString } from './utils';
+import { createMateria, getAllMaterias } from '../../prisma/services/materia.service';
+import { createCurso } from '../../prisma/services/curso.service';
 
 
 export type AuthState = {
@@ -238,12 +241,76 @@ async function sendAdministrador(formData: FormData): Promise<State> {
   
 
 export async function sendCurso(prevState: State, formData: FormData): Promise<State> {
-  return new Promise((resolve, reject) => {
-    resolve({
-      message: "Curso creado"
-    })
+
+  const materias = formData.getAll('materias[]').map(materia => materia.toString())
+
+  //Filtrar materias que tengan al menos una letra
+  const filteredMaterias = materias.filter(materia => {
+    return /^(?=.*[a-zA-ZáéíóúñÁÉÍÓÚÑ])[a-zA-Z0-9áéíóúñÁÉÍÓÚÑ\s]+$/.test(materia);
+  });
+  
+  //Enviar error si no hay materias filtradas
+  if (filteredMaterias.length < materias.length) {
+    return {
+      errors: {
+        description: "Materias inválidas"
+      },
+      message: "Debe ingresar nombres de materias válidos"
+    };
+  }
+
+  //Enviar error si hay materias duplicadas
+  if (new Set(filteredMaterias).size !== filteredMaterias.length) {
+    return {
+      errors: {
+        description: "Materias duplicadas"
+      },
+      message: "No puede haber dos materias iguales en el mismo curso"
+    };
+  }
+
+  const materiasExistentes = await getAllMaterias();
+
+  const materiasCoincidentes = materiasExistentes.filter(materiaExiste => {
+    return filteredMaterias.some(materia => normalizeString(materia) === normalizeString(materiaExiste.nombre));
   })
+
+  const materiasNuevas = filteredMaterias.filter(materia => {
+    return !materiasExistentes.some(materiaExiste => normalizeString(materia) === normalizeString(materiaExiste.nombre));
+  })
+
+  const materiasIds = materiasCoincidentes.map(materia => {
+    return materia.id
+  })
+
+  for (const materiaNueva of materiasNuevas) {
+    const materiaCreada = await createMateria({
+      nombre: capitalizeInitials(materiaNueva),
+    })
+    materiasIds.push(materiaCreada.id)
+  }
+
+  const name = formData.get('name')?.toString() || ''
+
+  const curso = {
+    nombre: name,
+    materiasIds: materiasIds
+  }
+
+  try {
+    await createCurso(curso)
+    return {
+      message: "Curso Creado"
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      errors: {description: "Error creando el curso"},
+      message: "Error creando el curso"
+    }
+  }
 }
+
 
 
 async function registrarAlumno(alumno: Alumno) {
@@ -314,3 +381,4 @@ function getApellido(fullName: string | undefined) {
   console.log("apll: " + parts[parts.length - 1])
   return parts[parts.length - 1] || null;
 }
+

@@ -59,7 +59,7 @@ export interface Materia {
     id: string;
     nombre: string;
     docente?: Docente | null;
-    cursos: Curso[];
+    cursos?: Curso[];
 }
 
 export interface Curso {
