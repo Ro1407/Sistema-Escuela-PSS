@@ -120,9 +120,10 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
         <Label className="mr-2 mt-2 w-44" htmlFor="userType">Tipo de Usuario: *</Label>
         <Select name="userType" required onValueChange={handleUserChange} value={formData.user}>
           <SelectTrigger id="userType" className="w-full">
-            <SelectValue placeholder="Tipo Usuario" />
+            <SelectValue placeholder="Seleccione un tipo" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="ninguno"></SelectItem> 
             <SelectItem value="padre">Padre</SelectItem>
             <SelectItem value="alumno">Alumno</SelectItem>
             <SelectItem value="docente">Docente</SelectItem>
