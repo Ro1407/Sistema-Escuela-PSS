@@ -23,3 +23,45 @@ export async function getUser(username: string): Promise<Usuario | null> {
         },
     });
 }
+
+export async function dniExists(dni: string): Promise<boolean> {
+    const user = await prisma.usuario.findFirst({
+        where: {
+            OR: [
+                { padre: { dni } },
+                { alumno: { dni } },
+                { docente: { dni } },
+                { administrativo: { dni } }
+            ]
+        }
+    });
+    return !!user;
+}
+
+export async function correoElectronicoExists(correoElectronico: string): Promise<boolean> {
+    const user = await prisma.usuario.findFirst({
+        where: {
+            OR: [
+                { padre: { correoElectronico } },
+                { alumno: { correoElectronico } },
+                { docente: { correoElectronico } },
+                { administrativo: { correoElectronico } }
+            ]
+        }
+    });
+    return !!user;
+}
+
+export async function matriculaAlumnoExists(numeroMatricula: string): Promise<boolean> {
+    const alumno = await prisma.alumno.findUnique({
+        where: { numeroMatricula }
+    });
+    return !!alumno;
+}
+
+export async function matriculaDocenteExists(matricula: string): Promise<boolean> {
+    const docente = await prisma.docente.findUnique({
+        where: {matricula}
+    });
+    return !!docente;
+}

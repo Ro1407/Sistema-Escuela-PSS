@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
-import { sendUser } from '@/lib/actions';
+import {sendUser, validateGeneral} from '@/lib/actions';
 import { Curso, Materia } from "../../../../prisma/interfaces";
 import { Progress } from "@/components/ui/progress";
 
@@ -27,6 +27,8 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
     materia: '',
     hijos: hijos,
   });
+
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
   useEffect(() => {
     if (isSubmitting) {
@@ -86,35 +88,102 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
     setIsSubmitting(true);
     setProgress(10);
 
-    state.errors = null;
-    state.message = null;
+    const errors: string[] = [];
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-    const formDataToSubmit = new FormData(event.currentTarget as HTMLFormElement);
+    // Check required fields
+    const requiredFields = [
+      { name: 'name', label: 'Nombre y apellido' },
+      { name: 'dni', label: 'DNI' },
+      { name: 'address', label: 'Dirección' },
+      { name: 'phone', label: 'Num. Teléfono' },
+      { name: 'email', label: 'Correo Electrónico' },
+    ];
 
-    await dispatch(formDataToSubmit);
+    requiredFields.forEach(field => {
+      const input = form.elements.namedItem(field.name) as HTMLInputElement;
+      if (!input || !input.value) {
+        errors.push(`Por favor, complete el campo ${field.label}`);
+      }
+    });
+
+    const userType = form.elements.namedItem('userType') as HTMLInputElement;
+    if(!userType || !userType.value) {
+        errors.push('Por favor, seleccione un Tipo de Usuario');
+    }
+
+    // Check user type specific fields
+    if (userType && userType.value === 'docente') {
+      const matricula = form.elements.namedItem('matricula') as HTMLInputElement;
+      const materia = form.elements.namedItem('materia') as HTMLInputElement;
+      const cursos = form.elements.namedItem('cursos[]') as unknown as NodeListOf<HTMLInputElement>;
+
+      if (!matricula || !matricula.value) {
+        errors.push('Por favor, ingrese la matrícula');
+      }
+      if (!materia || !materia.value) {
+        errors.push('Por favor, seleccione una materia');
+      }
+      if (!Array.from(cursos).some(curso => curso.checked)) {
+        errors.push('Por favor, seleccione al menos un curso');
+      }
+    } else if (userType && userType.value === 'alumno') {
+      const curso = form.elements.namedItem('curso') as HTMLInputElement;
+      const matricula = form.elements.namedItem('matricula') as HTMLInputElement;
+
+      if (!curso || !curso.value) {
+        errors.push('Por favor, seleccione un curso');
+      }
+      if (!matricula || !matricula.value) {
+        errors.push('Por favor, ingrese la matrícula');
+      }
+    }
+
+    if (errors.length > 0) {
+      setFormErrors(errors);
+      setIsSubmitting(false);
+      setProgress(0);
+      return;
+    }
+
+    try {
+      const result = await validateGeneral(formData);
+      state.errors = result.errors;
+      state.message = result.message;
+      setProgress(100);
+    } catch (error) {
+      state.errors = {description: "Ocurrió un error durante la validación" };
+      state.message = "Ocurrió un error durante la validación";
+      console.error("Error during validation:", error);
+    } finally {
+      setTimeout(() => setIsSubmitting(false), 500);
+    }
+
+    await dispatch(formData);
   };
 
   return (
     <form onSubmit={handleSubmit} ref={formRef} className="flex flex-col space-y-8 m-6">
       <div className="flex align-middle">
         <Label className="mr-2 mt-2 w-44" htmlFor="name">Nombre y apellido: *</Label>
-        <Input id="name" name="name" required />
+        <Input id="name" name="name" />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="dni">DNI: *</Label>
-        <Input id="dni" name="dni" required type="number" />
+        <Input id="dni" name="dni" type="number" />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="address">Dirección: *</Label>
-        <Input id="address" name="address" required />
+        <Input id="address" name="address" />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="phone">Num. Teléfono: *</Label>
-        <Input id="phone" name="phone" type="tel" required />
+        <Input id="phone" name="phone" type="tel" />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="email">Correo Electrónico: *</Label>
-        <Input id="email" name="email" required />
+        <Input id="email" name="email" />
       </div>
       <div className="flex">
         <Label className="mr-2 mt-2 w-44" htmlFor="userType">Tipo de Usuario: *</Label>
@@ -123,7 +192,6 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
             <SelectValue placeholder="Seleccione un tipo" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ninguno"></SelectItem> 
             <SelectItem value="padre">Padre</SelectItem>
             <SelectItem value="alumno">Alumno</SelectItem>
             <SelectItem value="docente">Docente</SelectItem>
@@ -242,15 +310,25 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
 
       {/* Mostrar mensajes de éxito y error */}
       <div className="mt-4">
+        {formErrors.length > 0 && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <strong className="font-bold">Error:</strong>
+              <ul className="list-disc list-inside">
+                {formErrors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+        )}
         {state?.errors && (
-          <p className="text-red-600 text-center">
-            {state.message ? state.message : state.errors.description}
-          </p>
+            <p className="text-red-600 text-center">
+              {state.message ? state.message : state.errors.description}
+            </p>
         )}
         {state?.message && !state.errors && (
-          <p className="text-green-600 text-center">
-            {state.message}
-          </p>
+            <p className="text-green-600 text-center">
+              {state.message}
+            </p>
         )}
       </div>
 
