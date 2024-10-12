@@ -12,6 +12,18 @@ export async function createCurso(data: Omit<Curso, 'id' | 'materias'> & { mater
     });
 }
 
+export async function updateMateriasCurso(id: string,  newMateriasIds: string[], deletedMateriasIds: string[]): Promise<Curso> {
+    return prisma.curso.update({
+        where: {id},
+        data: {
+            materias: {
+                connect: newMateriasIds.map(id => ({id})), 
+                disconnect: deletedMateriasIds.map(id => ({id}))
+            }
+        }
+    });
+}
+
 export async function getAllCursosNombreID(){
     return prisma.curso.findMany(
         {select: {
@@ -35,5 +47,11 @@ export async function getAllCursosConMaterias(): Promise<Curso[]> {
         include: {
             materias: true
         }
+    });
+}
+
+export async function deleteCursoById(id: string) {
+    return prisma.curso.delete({
+        where: {id}
     });
 }
