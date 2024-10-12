@@ -96,6 +96,7 @@ async function sendAlumno(formData: FormData): Promise<State> {
     cursoId: formData.get('curso')?.toString() || 'null',
     dni: dni,
     numeroMatricula: formData.get('matricula')?.toString() || 'null',
+    padreId: null,
     usuario: {
       usuario: correoElectronico,
       password: dni

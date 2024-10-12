@@ -37,6 +37,7 @@ export interface Alumno {
   direccion: string;
   telefono: string;
   correoElectronico: string;
+  padreId: string | null;
   usuario: {
     usuario: string,
     password: string
