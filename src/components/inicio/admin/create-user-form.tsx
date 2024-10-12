@@ -1,25 +1,26 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { PlusCircle } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { useFormState } from "react-dom";
-import {sendUser, validateGeneral} from '@/lib/actions';
-import { Curso, Materia } from "../../../../prisma/interfaces";
 import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { sendUser, validateGeneral } from '@/lib/actions';
+import { PlusCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+import { Curso, Materia } from "../../../../prisma/interfaces";
 
 export default function CreateUserForm({ materias, cursos }: { materias: Materia[], cursos: Curso[] }) {
+  const formRef = useRef<HTMLFormElement>(null);
   const initialState = { errors: null, message: null };
   const [state, dispatch] = useFormState(sendUser, initialState);
-  const formRef = useRef<HTMLFormElement>(null);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [estadoVisible, setEstadoVisible] = useState(false);
+
   const [hijos, setHijos] = useState(['']);
   const [formData, setFormData] = useState({
     user: '',
@@ -48,6 +49,7 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
     if (isSubmitting && (state.errors || state.message)) {
       setProgress(100);
       setIsSubmitting(false);
+      setEstadoVisible(true)
     }
 
     if (state.message && !state.errors) {
@@ -59,6 +61,13 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
         hijos: ['']
       });
     }
+
+    const timer = setTimeout(() => {
+      setEstadoVisible(false);
+    }, 7000);
+
+    return () => clearTimeout(timer);
+
   }, [state.errors, state.message]);
 
   const handleUserChange = (value: string) => {
@@ -331,6 +340,20 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
             </p>
         )}
       </div>
+      {estadoVisible &&
+          <div className="mt-4">
+            {state?.errors && (
+              <p className="text-red-600 text-center">
+                {state.message ? state.message : state.errors.description}
+              </p>
+            )}
+            {state?.message && !state.errors && (
+              <p className="text-green-600 text-center">
+                {state.message}
+              </p>
+            )}
+          </div>
+        }
 
       <div className="flex align-center">
         <p>(*) Campos OBLIGATORIOS</p>

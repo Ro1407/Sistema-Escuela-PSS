@@ -31,3 +31,13 @@ export function capitalizeInitials(str: string) {
     .join(' '); // Volver a unir las palabras con espacios
 }
 
+export function verifyDuplicates(array: string[]): boolean {
+
+  const normalizedArray = array.map(normalizeString);
+
+  if (new Set(normalizedArray).size !== normalizedArray.length) {
+    return true
+  }
+
+  return false
+}

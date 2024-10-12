@@ -69,6 +69,15 @@ export async function getAlumnosByDNI(dnis: string[]): Promise<Alumno[]> {
     });
 }
 
+
+export async function getAlumnosCurso(cursoId: string): Promise<Alumno[]> {
+    return prisma.alumno.findMany({
+        where: {
+            cursoId
+        }
+    });
+}
+
 export async function getAllAlumnos(): Promise<Alumno[]> {
     const alumnos = await prisma.alumno.findMany({
         include: {
