@@ -72,7 +72,7 @@ export default function EditUserForm({ user, materias, cursos, setUser }: { user
 
     return () => clearTimeout(timer);
 
-  }, [state.errors, state.message]);
+  }, [state.errors, state.message, isSubmitting]);
 
   const handleHijoChange = (id: string) => {
     const hijoCambiado = hijosActuales.find((hijo) => hijo.alumno.id === id);
@@ -128,7 +128,7 @@ export default function EditUserForm({ user, materias, cursos, setUser }: { user
       <div className="flex flex-col align-center flex-grow w-1/5">
         <DeleteUser id={user.id} userType={user.tipo} onDelete={handleDeleteResult} isDeleting={isDeleting} setIsDeleting={setIsDeleting} />
       </div>
-      <form onSubmit={handleSubmit} ref={formRef}className="flex flex-col flex-grow w-4/5 space-y-8 m-6">
+      <form onSubmit={handleSubmit} ref={formRef} className="flex flex-col flex-grow w-4/5 space-y-8 m-6">
         <div className="flex align-middle">
           <Label className="mr-2 mt-2 w-44" htmlFor="name">Nombre y apellido: *</Label>
           <Input id="name" name="name" defaultValue={user.nombre + " " + user.apellido} />

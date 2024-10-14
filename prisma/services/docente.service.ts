@@ -51,9 +51,25 @@ export async function getDocente(id: string): Promise<Docente | null> {
         where: { id },
         include: {
             usuario: true, 
-            materia: true 
+            materia: true,
+						cursos: true
         }
     });
+}
+
+export async function getDocenteConAlumnos(id: string): Promise<Docente | null> {
+	return prisma.docente.findUnique({
+			where: { id },
+			include: {
+					usuario: true, 
+					materia: true,
+					cursos: {
+							include: {
+									alumnos: true, 
+							}
+					}
+			}
+	});
 }
 
 export async function getDocenteByDNI(dni: string): Promise<Docente & { materia: Materia} | null> {
