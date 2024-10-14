@@ -1,5 +1,5 @@
 import prisma from '../prismaClientInitialization';
-import { Rol } from '@prisma/client'; 
+import { Rol } from '@prisma/client';
 import { Administrativo } from '../interfaces';
 
 export async function createAdministrativo(
@@ -17,12 +17,12 @@ export async function createAdministrativo(
                 create: {
                     usuario: data.usuario.usuario,
                     password: data.usuario.password,
-                    rol: Rol.ADMINISTRATIVO 
+                    rol: Rol.ADMINISTRATIVO
                 }
             }
         },
         include: {
-            usuario: true 
+            usuario: true
         }
     });
 }
@@ -36,6 +36,12 @@ export async function getAdministrativo(id: string): Promise<Administrativo | nu
     });
 }
 
+export async function getAdministrativoByDNI(dni: string): Promise<Administrativo | null> {
+    return prisma.administrativo.findUnique({
+        where: { dni },
+    });
+}
+
 export async function getAllAdministrativos(): Promise<Administrativo[]> {
     return prisma.administrativo.findMany({
         include: {
@@ -46,27 +52,34 @@ export async function getAllAdministrativos(): Promise<Administrativo[]> {
 
 export async function updateAdministrativo(
     id: string,
-    data: Partial<Omit<Administrativo, 'id' | 'usuario'>> & { usuario?: { usuario?: string; password?: string } }
+    data: Omit<Administrativo, 'id' | 'usuario'> & { usuario: { usuario: string; password?: string } }
 ): Promise<Administrativo> {
-    const updateData: any = { ...data };
-
-    if (data.usuario) {
-        updateData.usuario = {
-            update: {
-                ...(data.usuario.usuario && { usuario: data.usuario.usuario }),
-                ...(data.usuario.password && { password: data.usuario.password })
+    try {
+        return await prisma.administrativo.update({
+            where: { id },
+            data: {
+                nombre: data.nombre,
+                apellido: data.apellido,
+                dni: data.dni,
+                direccion: data.direccion,
+                numeroTelefono: data.numeroTelefono,
+                correoElectronico: data.correoElectronico,
+                usuario: {
+                    update: {
+                        usuario: data.usuario.usuario,
+                        ...(data.usuario.password && { password: data.usuario.password })  // Solo actualiza la contraseña si se proporciona
+                    }
+                }
+            },
+            include: {
+                usuario: true
             }
-        };
+        });
+    } catch (e) {
+        throw new Error(e instanceof Error ? e.message : 'Error en la base de datos al actualizar el administrativo');
     }
-
-    return prisma.administrativo.update({
-        where: { id },
-        data: updateData,
-        include: {
-            usuario: true
-        }
-    });
 }
+
 
 export async function deleteAdministrativo(id: string): Promise<Administrativo> {
     return prisma.administrativo.delete({
