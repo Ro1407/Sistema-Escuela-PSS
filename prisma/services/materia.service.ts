@@ -2,8 +2,8 @@ import prisma from '../prismaClientInitialization';
 import {Materia} from '../interfaces';
 
 export async function createMateria(data: Omit<Materia, 'id' | 'docente' | 'cursos'> & {
-    docenteId: string,
-    cursosIds: string[]
+    docenteId?: string,
+    cursosIds?: string[]
 }): Promise<Materia> {
     return prisma.materia.create({
         data: {
@@ -13,7 +13,7 @@ export async function createMateria(data: Omit<Materia, 'id' | 'docente' | 'curs
         },
         include: {
             docente: true,
-            cursos: true
+            cursos: true,
         }
     });
 }
@@ -99,6 +99,15 @@ export async function updateMateria(id: string, data: Partial<Omit<Materia, 'id'
         data: updateData,
         include: {
             docente: true,
+            cursos: true
+        }
+    });
+}
+
+export async function getMateriasCurso(idCurso: string): Promise<Materia[]> {
+    return prisma.materia.findMany({
+        where: {cursos: {some: {id: idCurso}}},
+        include: {
             cursos: true
         }
     });
