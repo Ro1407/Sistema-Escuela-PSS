@@ -44,7 +44,7 @@ export async function getAlumno(id: string): Promise<Alumno | null> {
             amonestaciones: true,
             asistencia: true,
             notas: true,
-            boletin: true
+						boletin: true
         }
     });
 }

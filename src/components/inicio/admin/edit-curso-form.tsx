@@ -66,7 +66,7 @@ export default function EditCursoForm({ cursos }: { cursos: Curso[] }) {
 
     return () => clearTimeout(timer);
 
-  }, [state.errors, state.message]);
+  }, [state.errors, state.message, isSubmitting]);
 
 
   const handleAddMateria = () => {

@@ -5,6 +5,7 @@
     "@typescript-eslint/no-empty-object-type": "off",
     "no-var": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "prefer-const": "off"
+    "prefer-const": "off",
+    "react/jsx-key": "off"
   }
 }
