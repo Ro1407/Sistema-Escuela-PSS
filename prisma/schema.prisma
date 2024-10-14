@@ -52,6 +52,10 @@ model Alumno {
   padreId           String?
   curso             Curso   @relation(name: "AlumnoCurso", fields: [cursoId], references: [id])
   cursoId           String
+  amonestaciones    Amonestacion[] @relation(name: "AmonestacionAlumno")
+  asistencia        Asistencia[]   @relation(name: "AsistenciaAlumno")
+  notas             Nota[]         @relation(name: "NotaAlumno")
+  boletin           Boletin[]       @relation(name: "BoletinAlumno")
 }
 
 model Docente {
@@ -85,6 +89,7 @@ model Materia {
   nombre  String
   docente Docente? @relation(name: "DocenteMateria")
   cursos  Curso[]  @relation("MateriaCurso")
+  notas   Nota[]  @relation("NotaMateria")
 }
 
 model Curso {
@@ -93,4 +98,62 @@ model Curso {
   materias Materia[] @relation("MateriaCurso")
   docentes Docente[] @relation("DocenteCurso")
   alumnos  Alumno[]  @relation(name: "AlumnoCurso")
+}
+
+model Amonestacion {
+  id          String   @id @default(uuid())
+  tipo        Tipo
+  fecha       DateTime
+  descripcion String
+  firma       Boolean  @default(false)
+  alumno      Alumno   @relation(fields: [alumnoId], references: [id], name: "AmonestacionAlumno")
+  alumnoId    String
+}
+
+enum Tipo {
+  SANCION
+  AMONESTACION
+}
+
+model Asistencia {
+  id              String   @id @default(uuid())
+  fecha           DateTime
+  tipo_asistencia TipoAsistencia
+  alumno          Alumno   @relation(fields: [alumnoId], references: [id], name: "AsistenciaAlumno")
+  alumnoId        String
+}
+
+enum TipoAsistencia {
+  AUSENTE
+  PRESENTE
+  TARDE
+  JUSTIFICADA
+}
+
+model Nota {
+  id              String   @id @default(uuid())
+  calificacion    String
+  alumno          Alumno   @relation(fields: [alumnoId], references: [id], name: "NotaAlumno")
+  alumnoId        String
+  materia         Materia  @relation(fields: [materiaId], references: [id], name: "NotaMateria")
+  materiaId       String
+  boletin         Boletin  @relation(fields: [boletinId], references: [id], name: "BoletinNota")
+  boletinId       String
+}
+
+model Boletin {
+  id              String   @id @default(uuid())
+  periodo         Periodo
+  anio            String
+  alumno          Alumno   @relation(fields: [alumnoId], references: [id], name: "BoletinAlumno")
+  alumnoId        String
+  notas           Nota[]   @relation("BoletinNota")
+}
+
+enum Periodo {
+  PRIMER_TRIMESTRE
+  SEGUNDO_TRIMESTRE
+  TERCER_TRIMESTRE
+  ENERO
+  MARZO
 }
