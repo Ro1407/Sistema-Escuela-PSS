@@ -28,10 +28,16 @@ export async function getAllCursosNombreID(){
     return prisma.curso.findMany(
         {select: {
             id: true,
-            nombre: true,}
+            nombre: true,
+					}
         });
 }
 
+export async function getCursoByID(id: string): Promise<Curso | null> {
+		return prisma.curso.findUnique({
+				where: {id}
+		});
+}
 
 export async function getCursoConMaterias(id: string): Promise<Curso | null> {
     return prisma.curso.findUnique({
