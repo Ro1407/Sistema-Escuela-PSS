@@ -13,6 +13,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+export function FechaActual() {
+  const f = new Date();
+
+  const dia = String(f.getDate()).padStart(2, '0');
+  const mes = String(f.getMonth() + 1).padStart(2, '0');
+  const anio = String(f.getFullYear()).slice(-2);
+
+  const fechaFormateada = `${dia}/${mes}/${anio}`;
+
+  return (
+    <h2 className="text-gray-600">{fechaFormateada}</h2>
+  );
+}
+
 export function DatePicker() {
   const [date, setDate] = React.useState<Date>()
 

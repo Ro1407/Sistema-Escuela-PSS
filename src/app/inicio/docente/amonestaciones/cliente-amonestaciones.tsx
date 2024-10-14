@@ -4,12 +4,13 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DatePicker } from "@/components/ui/date-picker"
+import { FechaActual } from "@/components/ui/date-picker"
 import { Textarea } from "@/components/ui/textarea"
-import { Alumno } from "./page"
+import { Alumno } from "../../../../../prisma/interfaces"
 import { Amonestacion } from "../../../../../prisma/interfaces"
 import { Tipo } from '@prisma/client';
 import { sendAmonestacion } from "../../../../lib/actions";
+import { useStateContext } from "@/components/inicio/docente/stateContext"
 
 export default function AmonestacionesCliente({ alumnos, amons }: { alumnos: Alumno[], amons: Amonestacion[] }) {
     const [alumnoSelect, setAlumnoSelect] = useState<Alumno | null>(null)
@@ -39,6 +40,7 @@ function ListadoAlumnos(
             alumnoSelect: Alumno | null,
             amonSelect: Amonestacion | null
         }) {
+    const { cursoSeleccionado, setCursoSeleccionado } = useStateContext()
     return (
         <div className="flex flex-row items-center p-2">
             <div className="flex flex-col items-center p-2">
@@ -46,7 +48,7 @@ function ListadoAlumnos(
                 <ScrollArea className="h-[400px] w-48 rounded-md border">
                     <div className="flex flex-col p-4">
                         {
-                            (alums).map((alum, index) => (
+                            (alums.filter((al) => (al.cursoId === cursoSeleccionado?.id))).map((alum, index) => (
                                 <Button
                                     variant="outline"
                                     onClick={() => setterAlumno(alum)}
@@ -166,7 +168,7 @@ function PanelNewAmon({ alumno }: { alumno: Alumno | null }) {
                 </TabsList>
             </Tabs>
             <h3>Fecha:</h3>
-            <DatePicker />
+            <FechaActual />
             <h3>Descripción:</h3>
             <Textarea onChange={(e) => descHandler(e.target.value)} />
             <div className="flex flex-row">
