@@ -68,7 +68,7 @@ export default function CreateUserForm({ materias, cursos }: { materias: Materia
 
     return () => clearTimeout(timer);
 
-  }, [state.errors, state.message]);
+  }, [state.errors, state.message, isSubmitting]);
 
   const handleUserChange = (value: string) => {
     setFormData(prevData => ({ ...prevData, user: value }))
