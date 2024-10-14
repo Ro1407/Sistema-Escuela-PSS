@@ -64,59 +64,14 @@ export async function logout() {
   redirect('/login')
 }
 
-export async function validateGeneral(formData: FormData): Promise<State> {
-  let state: State = { errors: { description: "error de formulario" }, message: "error recuperando formulario" };
-
-  const form_dni = formData.get('dni') as string;
-  const form_email = formData.get('email') as string;
-  const form_userType = formData.get('userType') as string;
-
-  try {
-    if (await dniExists(form_dni)) {
-      return { errors: { description: 'El DNI ya está registrado' }, message: "El DNI ya está registrado" };
-    }
-    if (await correoElectronicoExists(form_email)) {
-      return {
-        errors: { description: 'El correo electrónico ya está registrado' },
-        message: "El correo electrónico ya está registrado"
-      };
-    }
-
-    if (form_userType === 'alumno') {
-      const form_matricula = formData.get('matricula') as string;
-      if (await matriculaAlumnoExists(form_matricula)) {
-        return {
-          errors: { description: 'La matrícula ya está registrada' },
-          message: "La matrícula ya está registrada"
-        };
-      }
-    }
-
-    if (form_userType === 'docente') {
-      const form_matricula = formData.get('matricula') as string;
-      if (await matriculaDocenteExists(form_matricula)) {
-        return {
-          errors: { description: 'La matrícula ya está registrada' },
-          message: "La matrícula ya está registrada"
-        };
-      }
-    }
-
-  } catch (error) {
-    console.error('Error validating user:', error);
-    return {
-      errors: { description: 'Ocurrió un error durante la validación' },
-      message: "Ocurrió un error durante la validación"
-    };
-  }
-
-  return state;
-}
-
 export async function sendUser(prevState: State, formData: FormData): Promise<State> {
   const userTy = formData.get('userType')
   let state: State = { errors: { description: "error de formulario" }, message: "error recuperando formulario" }
   switch (userTy) {
+    case 'ninguno':
+      state = {
+        errors: { description: "Debe seleccionar un tipo de usuario" }, message: "Debe seleccionar un tipo de usuario"}
+      break;
     case 'alumno':
       state = await sendAlumno(formData);
       break;
