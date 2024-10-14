@@ -388,6 +388,7 @@ export async function updateAlumnoById(formData: FormData, userId: string): Prom
   }
   try {
     await updateAlumno(userId, alumno)
+    revalidatePath('inicio/admin')
     return {
       message: "Usuario Actualizado"
     }
@@ -422,6 +423,7 @@ export async function updateDocenteById(formData: FormData, userId: string): Pro
   console.log(docente)
   try {
     await updateDocente(userId, docente)
+    revalidatePath('inicio/admin')
     return {
       message: "Usuario Actualizado"
     }
@@ -483,6 +485,7 @@ export async function updatePadreById(formData: FormData, userId: string): Promi
 
   try {
     await updatePadre(userId, padre)
+    revalidatePath('inicio/admin')
     return {
       message: "Usuario Actualizado"
     }
@@ -514,6 +517,7 @@ export async function updateAdministradorById(formData: FormData, userId: string
   }
   try {
     await updateAdministrativo(userId, administrador)
+    revalidatePath('inicio/admin')
     return {
       message: "Usuario Actualizado"
     }

@@ -61,10 +61,9 @@ export default function EditUserForm({ user, materias, cursos, setUser }: { user
       setEstadoVisible(true)
     }
     
-    if (state.message && !state.errors) {
+    if (state.errors) {
       formRef.current?.reset();
       setNewHijos([]);
-      setHijosActuales([]);
     }
 
     const timer = setTimeout(() => {
