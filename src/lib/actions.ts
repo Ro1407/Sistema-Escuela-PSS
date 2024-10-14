@@ -18,6 +18,8 @@ import { createPadre, deletePadre, getPadreByDNI, updatePadre } from '../../pris
 import { AdministradorForm, AlumnoForm, DocenteForm, PadreForm, State, Administrativo, Docente, Padre, Alumno, User } from "./definitions";
 import { createSession, deleteSession, getSession } from './session';
 import { capitalizeInitials, normalizeString, verifyDuplicates } from './utils';
+import { createAmonestacion } from '../../prisma/services/amonestacion.service';
+import { Tipo } from '@prisma/client';
 
 export type AuthState = {
   error: string | null;
@@ -842,3 +844,24 @@ function getApellido(fullName: string | undefined) {
   return parts[parts.length - 1] || null;
 }
 
+export async function sendAmonestacion(alumnoId: string, tipo: Tipo, descripcion: string): Promise<void> {
+  if (!alumnoId || !descripcion) {
+    throw new Error("Faltan datos para crear la amonestación");
+  }
+
+  try {
+    const nuevaAmonestacion = {
+      tipo,
+      fecha: new Date(),
+      descripcion,
+      firma: false,
+      alumnoId,
+    };
+
+    // Llama al servicio para crear la amonestación
+    await createAmonestacion(nuevaAmonestacion);
+  } catch (error) {
+    console.error('Error creando la amonestación:', error);
+    throw new Error("Error al crear la amonestación");
+  }
+}
