@@ -9,16 +9,17 @@ import {
 } from '../../prisma/services/autenticacion.service';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createAdministrativo } from '../../prisma/services/administrativo.service';
-import { createAlumno, getAlumnosByDNI, getAlumnosCurso } from "../../prisma/services/alumno.service";
+import { createAdministrativo, deleteAdministrativo, getAdministrativoByDNI, updateAdministrativo } from '../../prisma/services/administrativo.service';
+import { createAlumno, deleteAlumno, getAlumnoByDNI, getAlumnosByDNI, getAlumnosCurso, updateAlumno } from "../../prisma/services/alumno.service";
 import { createCurso, deleteCursoById, updateMateriasCurso } from '../../prisma/services/curso.service';
-import { createDocente } from '../../prisma/services/docente.service';
+import { createDocente, deleteDocente, getDocenteByDNI, updateDocente } from '../../prisma/services/docente.service';
 import { createMateria, getAllMaterias } from '../../prisma/services/materia.service';
-import { createPadre } from '../../prisma/services/padre.service';
-import { Administrador, Alumno, Docente, Padre, State } from "./definitions";
+import { createPadre, deletePadre, getPadreByDNI, updatePadre } from '../../prisma/services/padre.service';
+import { AdministradorForm, AlumnoForm, DocenteForm, PadreForm, State, Administrativo, Docente, Padre, Alumno, User } from "./definitions";
 import { createSession, deleteSession, getSession } from './session';
 import { capitalizeInitials, normalizeString, verifyDuplicates } from './utils';
-
+import { createAmonestacion } from '../../prisma/services/amonestacion.service';
+import { Tipo } from '@prisma/client';
 
 export type AuthState = {
   error: string | null;
@@ -63,59 +64,14 @@ export async function logout() {
   redirect('/login')
 }
 
-export async function validateGeneral(formData: FormData): Promise<State> {
-  let state: State = { errors: { description: "error de formulario" }, message: "error recuperando formulario" };
-
-  const form_dni = formData.get('dni') as string;
-  const form_email = formData.get('email') as string;
-  const form_userType = formData.get('userType') as string;
-
-  try {
-    if (await dniExists(form_dni)) {
-      return { errors: { description: 'El DNI ya está registrado' }, message: "El DNI ya está registrado" };
-    }
-    if (await correoElectronicoExists(form_email)) {
-      return {
-        errors: { description: 'El correo electrónico ya está registrado' },
-        message: "El correo electrónico ya está registrado"
-      };
-    }
-
-    if (form_userType === 'alumno') {
-      const form_matricula = formData.get('matricula') as string;
-      if (await matriculaAlumnoExists(form_matricula)) {
-        return {
-          errors: { description: 'La matrícula ya está registrada' },
-          message: "La matrícula ya está registrada"
-        };
-      }
-    }
-
-    if (form_userType === 'docente') {
-      const form_matricula = formData.get('matricula') as string;
-      if (await matriculaDocenteExists(form_matricula)) {
-        return {
-          errors: { description: 'La matrícula ya está registrada' },
-          message: "La matrícula ya está registrada"
-        };
-      }
-    }
-
-  } catch (error) {
-    console.error('Error validating user:', error);
-    return {
-      errors: { description: 'Ocurrió un error durante la validación' },
-      message: "Ocurrió un error durante la validación"
-    };
-  }
-
-  return state;
-}
-
 export async function sendUser(prevState: State, formData: FormData): Promise<State> {
   const userTy = formData.get('userType')
   let state: State = { errors: { description: "error de formulario" }, message: "error recuperando formulario" }
   switch (userTy) {
+    case 'ninguno':
+      state = {
+        errors: { description: "Debe seleccionar un tipo de usuario" }, message: "Debe seleccionar un tipo de usuario"}
+      break;
     case 'alumno':
       state = await sendAlumno(formData);
       break;
@@ -135,7 +91,7 @@ export async function sendUser(prevState: State, formData: FormData): Promise<St
 }
 
 async function sendAlumno(formData: FormData): Promise<State> {
-  let alumno: Alumno | undefined;
+  let alumno: AlumnoForm | undefined;
   const dni = formData.get('dni')?.toString() || ''
   const correoElectronico = formData.get('email')?.toString() || ''
   alumno = {
@@ -168,7 +124,7 @@ async function sendAlumno(formData: FormData): Promise<State> {
 
 
 async function sendDocente(formData: FormData): Promise<State> {
-  let docente: Docente | undefined;
+  let docente: DocenteForm | undefined;
   const dni = formData.get('dni')?.toString() || '';
   const correoElectronico = formData.get('email')?.toString() || '';
 
@@ -206,7 +162,7 @@ async function sendDocente(formData: FormData): Promise<State> {
 }
 
 async function sendPadre(formData: FormData): Promise<State> {
-  let padre: Padre | undefined;
+  let padre: PadreForm | undefined;
   const dni = formData.get('dni')?.toString() || ''
   const correoElectronico = formData.get('email')?.toString() || ''
 
@@ -223,16 +179,6 @@ async function sendPadre(formData: FormData): Promise<State> {
     return acc;
   }, {} as Record<number, string>);
 
-  // Si hay errores, retornarlos
-  if (Object.keys(childFieldErrors).length > 0) {
-    return {
-      errors: {
-        childField: childFieldErrors,
-        description: null
-      },
-      message: "Error creando usuario"
-    };
-  }
   // Si hay errores, retornarlos
   if (Object.keys(childFieldErrors).length > 0) {
     return {
@@ -274,7 +220,7 @@ async function sendPadre(formData: FormData): Promise<State> {
 }
 
 async function sendAdministrador(formData: FormData): Promise<State> {
-  let administrador: Administrador | undefined;
+  let administrador: AdministradorForm | undefined;
   const dni = formData.get('dni')?.toString() || ''
   const correoElectronico = formData.get('email')?.toString() || ''
   administrador = {
@@ -300,7 +246,331 @@ async function sendAdministrador(formData: FormData): Promise<State> {
     }
 }
 
+export async function searchUser(userType: string, dni: string): Promise<User | null> {
+  try {
+    switch (userType) {
+      case 'alumno':
+        const alum = await getAlumnoByDNI(dni);
+        console.log(alum);
+        if (alum) {
+          const alumno: Alumno = {
+            ...alum,
+            numeroTelefono: alum.telefono,
+            tipo: 'ALUMNO'
+          }
+          return alumno
+        }
+        return null
+      case 'docente':
+        const doc = await getDocenteByDNI(dni);
+        console.log(doc);
+        if (doc) {
+          const docente: Docente = {
+            ...doc,
+            tipo: 'DOCENTE'
+          }
+          return docente
+        }
+        return null
+      case 'padre':
+        const pad = await getPadreByDNI(dni);
+        console.log(pad);
+        if (pad) {
+          const padre: Padre = {
+            ...pad,
+            tipo: 'PADRE',
+            hijos: pad.hijos.map(hijo => ({
+              ...hijo,
+              numeroTelefono: hijo.telefono,
+              tipo: 'ALUMNO'
+            }))
+          }
+          return padre
+        }
+        return null
 
+      case 'administrador':
+        const adm = await getAdministrativoByDNI(dni);
+        console.log(adm);
+        if (adm) {
+          const administrador: Administrativo = {
+            ...adm,
+            tipo: 'ADMINISTRATIVO'
+          }
+          return administrador
+        }
+        return null
+      default:
+        return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function updateUsuario(userType: string, userId: string, prevState: State, formData: FormData): Promise<State> {
+  switch (userType) {
+    case 'ALUMNO':
+      return await updateAlumnoById(formData, userId);
+    case 'DOCENTE':
+      return await updateDocenteById(formData, userId);
+    case 'PADRE':
+      return await updatePadreById(formData, userId);
+    case 'ADMINISTRATIVO':
+      return await updateAdministradorById(formData, userId);
+    default:
+      return prevState;
+  }
+}
+
+export async function updateAlumnoById(formData: FormData, userId: string): Promise<State> {
+  let alumno: AlumnoForm | undefined;
+  const dni = formData.get('dni')?.toString() || ''
+  const correoElectronico = formData.get('email')?.toString() || ''
+  alumno = {
+    nombre: getNombre(formData.get('name')?.toString()) || 'null',
+    apellido: getApellido(formData.get('name')?.toString()) || 'null',
+    direccion: formData.get('address')?.toString() || 'null',
+    telefono: formData.get('phone')?.toString() || 'null',
+    correoElectronico: formData.get('email')?.toString() || 'null',
+    cursoId: formData.get('curso')?.toString() || 'null',
+    dni: dni,
+    numeroMatricula: formData.get('matricula')?.toString() || 'null',
+    padreId: null,
+    usuario: {
+      usuario: correoElectronico,
+      password: dni
+    }
+  }
+  try {
+    await updateAlumno(userId, alumno)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Usuario Actualizado"
+    }
+  }
+  catch (error) {
+    console.log(error)
+    return {
+      errors: { description: "Error actualizando el usuario" },
+      message: "Error actualizando el usuario"
+    }
+  }
+}
+
+export async function updateDocenteById(formData: FormData, userId: string): Promise<State> {
+  const dni = formData.get('dni')?.toString() || ''
+  const correoElectronico = formData.get('email')?.toString() || ''
+  const docente = {
+    nombre: getNombre(formData.get('name')?.toString()) || 'null',
+    apellido: getApellido(formData.get('name')?.toString()) || 'null',
+    direccion: formData.get('address')?.toString() || 'null',
+    numeroTelefono: formData.get('phone')?.toString() || 'null',
+    correoElectronico: correoElectronico || 'null',
+    matricula: formData.get('matricula')?.toString() || 'null',
+    materiaId: formData.get('materia')?.toString() || 'null',
+    dni: dni,
+    cursosIds: formData.getAll('cursos[]').map(curso => curso.toString()),
+    usuario: {
+      usuario: correoElectronico,
+      password: dni
+    }
+  }
+  console.log(docente)
+  try {
+    await updateDocente(userId, docente)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Usuario Actualizado"
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      errors: { description: "Error actualizando el docente" },
+      message: "Error actualizando el docente"
+    }
+  }
+}
+
+export async function updatePadreById(formData: FormData, userId: string): Promise<State> {
+  let padre: PadreForm | undefined;
+  console.log(formData)
+  const dni = formData.get('dni')?.toString() || ''
+  const correoElectronico = formData.get('email')?.toString() || ''
+
+  const dnisHijos = formData.getAll('hijosNuevos[]').map(hijo => hijo.toString());
+
+  const hijosExistentes = await getAlumnosByDNI(dnisHijos);
+  const hijosExistentesDnis = hijosExistentes.map(hijo => hijo.dni);
+
+  // Mapear errores a cada índice correspondiente
+  const childFieldErrors: Record<number, string> = dnisHijos.reduce((acc, dni, index) => {
+    if (!hijosExistentesDnis.includes(dni)) {
+      acc[index] = `Alumno no encontrado`;
+    }
+    return acc;
+  }, {} as Record<number, string>);
+
+  // Si hay errores, retornarlos
+  if (Object.keys(childFieldErrors).length > 0) {
+    return {
+      errors: {
+        childField: childFieldErrors,
+        description: null
+      },
+      message: "Error actualizando usuario"
+    };
+  }
+  const hijosConservadosIds = formData.getAll('hijosConservados[]').map(hijo => hijo.toString());
+  const hijosNuevosIds = hijosExistentes.map(hijo => hijo.id);
+  const hijosIds = [...hijosConservadosIds, ...hijosNuevosIds];
+
+  padre = {
+    nombre: getNombre(formData.get('name')?.toString()) || 'null',
+    apellido: getApellido(formData.get('name')?.toString()) || 'null',
+    direccion: formData.get('address')?.toString() || 'null',
+    numeroTelefono: formData.get('phone')?.toString() || 'null',
+    correoElectronico: correoElectronico,
+    dni: dni,
+    usuario: {
+      usuario: dni,
+      password: dni
+    },
+    hijosIds: hijosIds
+  }
+
+  try {
+    await updatePadre(userId, padre)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Usuario Actualizado"
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      errors: { description: "Error actualizando el padre" },
+      message: "Error actualizando el padre"
+    }
+  }
+
+}
+
+export async function updateAdministradorById(formData: FormData, userId: string): Promise<State> {
+  let administrador: AdministradorForm | undefined;
+  const dni = formData.get('dni')?.toString() || ''
+  const correoElectronico = formData.get('email')?.toString() || ''
+  administrador = {
+    nombre: getNombre(formData.get('name')?.toString()) || 'null',
+    apellido: getApellido(formData.get('name')?.toString()) || 'null',
+    direccion: formData.get('address')?.toString() || 'null',
+    numeroTelefono: formData.get('phone')?.toString() || 'null',
+    correoElectronico: correoElectronico,
+    dni: dni,
+    usuario: {
+      usuario: correoElectronico,
+      password: dni
+    }
+  }
+  try {
+    await updateAdministrativo(userId, administrador)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Usuario Actualizado"
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      errors: { description: "Error actualizando el administrador" },
+      message: "Error actualizando el administrador"
+    }
+  }
+}
+
+export async function deleteUser(userId: string, userType: string): Promise<State> {
+  switch (userType) {
+    case 'ALUMNO':
+      return await deleteAlumnoById(userId);
+    case 'DOCENTE':
+      return await deleteDocenteById(userId);
+    case 'PADRE':
+      return await deletePadreById(userId);
+    case 'ADMINISTRATIVO':
+      return await deleteAdministradorById(userId);
+    default:
+      return {
+        message: 'Error'
+      }
+  }
+}
+
+export async function deleteAlumnoById(id: string) {
+  try {
+    await deleteAlumno(id)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Alumno Eliminado"
+    }
+  }
+  catch (e) {
+    console.log(e)
+    return {
+      errors: { description: "Error eliminando el alumno" },
+      message: "Error eliminando el alumno"
+    }
+  }
+}
+
+export async function deleteDocenteById(id: string) {
+  try {
+    await deleteDocente(id)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Docente Eliminado"
+    }
+  }
+  catch (e) {
+    console.log(e)
+    return {
+      errors: { description: "Error eliminando el docente" },
+      message: "Error eliminando el docente"
+    }
+  }
+}
+
+export async function deletePadreById(id: string) {
+  try {
+    await deletePadre(id)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Padre Eliminado"
+    }
+  }
+  catch (e) {
+    console.log(e)
+    return {
+      errors: { description: "Error eliminando el padre" },
+      message: "Error eliminando el padre"
+    }
+  }
+}
+
+export async function deleteAdministradorById(id: string) {
+  try {
+    await deleteAdministrativo(id)
+    revalidatePath('inicio/admin')
+    return {
+      message: "Administrador Eliminado"
+    }
+  }
+  catch (e) {
+    console.log(e)
+    return {
+      errors: { description: "Error eliminando el administrador" },
+      message: "Error eliminando el administrador"
+    }
+  }
+}
 
 export async function sendCurso(prevState: State, formData: FormData): Promise<State> {
 
@@ -462,7 +732,7 @@ async function manageAddedMaterias(materias: string[]): Promise<string[] | State
   return materiasIds
 }
 
-async function registrarAlumno(alumno: Alumno) {
+async function registrarAlumno(alumno: AlumnoForm) {
   try {
     await createAlumno(alumno)
     return true;
@@ -473,7 +743,7 @@ async function registrarAlumno(alumno: Alumno) {
 }
 
 
-async function registrarDocente(docente: Docente): Promise<{ success: boolean, error?: string }> {
+async function registrarDocente(docente: DocenteForm): Promise<{ success: boolean, error?: string }> {
   try {
     await createDocente(docente);
     return { success: true };
@@ -487,7 +757,7 @@ async function registrarDocente(docente: Docente): Promise<{ success: boolean, e
   }
 }
 
-async function registrarPadre(padre: Padre) {
+async function registrarPadre(padre: PadreForm) {
   try {
     await createPadre(padre)
     return true;
@@ -497,7 +767,7 @@ async function registrarPadre(padre: Padre) {
   }
 }
 
-async function registrarAdministrador(administrador: Administrador): Promise<{ success: boolean, error?: string }> {
+async function registrarAdministrador(administrador: AdministradorForm): Promise<{ success: boolean, error?: string }> {
   try {
     await createAdministrativo(administrador);
     return { success: true };
@@ -529,3 +799,24 @@ function getApellido(fullName: string | undefined) {
   return parts[parts.length - 1] || null;
 }
 
+export async function sendAmonestacion(alumnoId: string, tipo: Tipo, descripcion: string): Promise<void> {
+  if (!alumnoId || !descripcion) {
+    throw new Error("Faltan datos para crear la amonestación");
+  }
+
+  try {
+    const nuevaAmonestacion = {
+      tipo,
+      fecha: new Date(),
+      descripcion,
+      firma: false,
+      alumnoId,
+    };
+
+    // Llama al servicio para crear la amonestación
+    await createAmonestacion(nuevaAmonestacion);
+  } catch (error) {
+    console.error('Error creando la amonestación:', error);
+    throw new Error("Error al crear la amonestación");
+  }
+}
