@@ -2,14 +2,8 @@ import * as React from "react"
 import { getAllAlumnos } from "../../../../../prisma/services/alumno.service"
 import { getAllAmonestaciones } from "../../../../../prisma/services/amonestacion.service"
 import AmonestacionesCliente from "./cliente-amonestaciones"
+import { Alumno } from "../../../../../prisma/interfaces"
 
-
-export interface Alumno {
-  nombre: string,
-  apellido: string,
-  dni : string,
-  id : string
-}
 
 export interface Amonestacion {
   nombre: string
