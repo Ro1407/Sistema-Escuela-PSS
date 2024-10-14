@@ -7,28 +7,13 @@ export type State = {
   message?: string | null;
 };
 
-
-/*
-export type Alumno = {
-  nbre: string,
-  dni: number,
-  direccion: string,
-  tel: number,
-  email: string,
-  curso: string,
-  tutor: string,
-  matricula: number
-}
-
-  */
-
 export interface UsuarioJWT {
   id: string;
   usuario: string,
   rol: string
 }
 
-export interface Alumno {
+export interface AlumnoForm {
   nombre: string;
   apellido: string;
   cursoId: string;
@@ -48,10 +33,10 @@ export interface Materia {
   id: string;
   nombre: string;
   docenteId: string;
-  alumnos?: Alumno[];
+  alumnos?: AlumnoForm[];
 }
 
-export interface Docente {
+export interface DocenteForm {
   usuario: {
     usuario: string,
     password: string
@@ -67,7 +52,7 @@ export interface Docente {
   cursosIds: string[]
 }
 
-export interface Padre {
+export interface PadreForm {
   usuario: {
     usuario: string,
     password: string
@@ -81,7 +66,7 @@ export interface Padre {
   hijosIds: string[]
 }
 
-export interface Administrador {
+export interface AdministradorForm {
   usuario: {
     usuario: string,
     password: string
@@ -92,4 +77,51 @@ export interface Administrador {
   direccion: string;
   numeroTelefono: string;
   correoElectronico: string;
+}
+
+
+export interface UsuarioBase {
+  id: string;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  direccion: string;
+  numeroTelefono: string;
+  correoElectronico: string;
+}
+
+export interface Padre extends UsuarioBase {
+  hijos: Alumno[];
+  tipo: 'PADRE'
+}
+
+export interface Alumno extends UsuarioBase {
+  numeroMatricula: string;
+  padreId?: string | null; 
+  cursoId: string;
+  tipo: 'ALUMNO'
+}
+
+export interface Docente extends UsuarioBase {
+  matricula: string;
+  materiaId: string;
+  materia: MateriaBasica;
+  cursos?: Curso[];
+  tipo: 'DOCENTE'	
+}
+
+export interface Administrativo extends UsuarioBase {
+  tipo: 'ADMINISTRATIVO'
+}
+
+export type User = Alumno | Docente | Padre | Administrativo
+
+export interface MateriaBasica {
+  id: string;
+  nombre: string;
+}
+
+export interface Curso {
+  id: string;
+  nombre: string;
 }

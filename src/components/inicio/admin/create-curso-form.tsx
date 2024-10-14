@@ -52,7 +52,7 @@ export default function CreateCursoForm() {
 
     return () => clearTimeout(timer);
 
-  }, [state.errors, state.message]);
+  }, [state.errors, state.message, isSubmitting]);
 
   const handleAddMateria = () => {
     setMaterias([...materias, ''])
