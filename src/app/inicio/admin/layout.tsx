@@ -2,14 +2,13 @@
 import AdminOptions from "@/components/inicio/admin/AdminOptions";
 import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
-import { Alumno } from "@/lib/definitions"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { fetchUserSession } from "@/lib/actions";
 import { redirect } from "next/navigation";
 import { getAdministrativo } from "../../../../prisma/services/administrativo.service";
-import { deleteSession } from "@/lib/session";
 import LogoutButton from "@/components/inicio/LogoutButton";
+
 export const metadata: Metadata = {
   title: 'Administrar',
 }

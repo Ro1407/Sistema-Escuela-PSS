@@ -12,6 +12,10 @@ import { PlusCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFormState } from "react-dom";
 import { Curso, Materia } from "../../../../prisma/interfaces";
+import {Metadata} from "next";
+export const metadata: Metadata = {
+  title: 'Administrar',
+}
 
 export default function CreateUserForm({ materias, cursos }: { materias: Materia[], cursos: Curso[] }) {
   const formRef = useRef<HTMLFormElement>(null);
