@@ -1,5 +1,8 @@
 
+
 export default function InicioAlumnoPage() {
+ 
+
   return (
     <div>
       

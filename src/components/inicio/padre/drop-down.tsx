@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,40 +9,54 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
+import { Alumno } from "../../../../prisma/interfaces"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useStateContext } from "./stateContext"
 
-interface Hijo {
-  id: number
-  name: string
-}
+export default function HijosDropdown( {hijos} : {hijos: Alumno[] | undefined}) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const {hijoSeleccionado, setHijoSeleccionado} = useStateContext()
 
-const hijos: Hijo[] = [
-  { id: 1, name: "Hijo 1"},
-  { id: 2, name: "Hijo 2"},
-  { id: 3, name: "Hijo 3"},
-  { id: 4, name: "Hijo 4"},
-]
+  const handleHijoSelect = useCallback((hijo: Alumno) => {
+    setHijoSeleccionado(hijo)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('hijo', hijo.id.toString())
+    router.push(`?${params.toString()}`)
+  }, [router, searchParams, setHijoSeleccionado])
 
-export default function HijosDropdown() {
-  const [hijoSeleccionado, setHijoSeleccionado] = useState<Hijo>(hijos[0])
+  useEffect(() => {
+    const hijoId = searchParams.get('hijo')
+    if (hijoId && hijos) {
+      const hijo = hijos.find(h => h.id.toString() === hijoId)
+      if (hijo) {
+        setHijoSeleccionado(hijo)
+      }
+    }
+  }, [hijos, searchParams, setHijoSeleccionado])
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="w-[200px] justify-between">
           <div className="flex items-center">
-            <span>{hijoSeleccionado.name}</span>
+            <span>{hijoSeleccionado ? (
+                hijoSeleccionado.nombre + " " + hijoSeleccionado.apellido
+              ) : (
+                "Seleccione un hijo"
+              )}</span>
           </div>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[200px]">
-        {hijos.map((hijo) => (
+        {hijos?.map((hijo) => (
           <DropdownMenuItem
             key={hijo.id}
-            onSelect={() => setHijoSeleccionado(hijo)}
+            onSelect={() => handleHijoSelect(hijo)}
             className="flex items-center transition-colors duration-200 ease-in-out hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground"
           >
-            {hijo.name}
+            {hijo.nombre + " " + hijo.apellido}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

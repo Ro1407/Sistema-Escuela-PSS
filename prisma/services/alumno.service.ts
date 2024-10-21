@@ -84,6 +84,30 @@ export async function getAlumnosCurso(cursoId: string): Promise<Alumno[]> {
     });
 }
 
+export async function getAlumnoConAsistencia(id: string): Promise<Alumno | null> {
+    return prisma.alumno.findUnique({
+        where: { id },
+        include: {
+            asistencia: {
+                orderBy: {
+                    fecha: 'asc'
+                }
+            }
+        }
+    });
+}
+
+export async function getAlumnosCursoAsistencias(cursoId: string): Promise<Alumno[]> {
+    return prisma.alumno.findMany({
+        where: {
+            cursoId
+        }, 
+        include: {
+            asistencia: true
+        }
+    });
+}
+
 export async function getAllAlumnos(): Promise<Alumno[]> {
     const alumnos = await prisma.alumno.findMany({
         include: {

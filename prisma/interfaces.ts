@@ -86,7 +86,7 @@ export interface Amonestacion {
 
 export interface Asistencia {
     id: string;
-    fecha: Date;
+    fecha: Date | string;
     tipo_asistencia: PrismaTipoAsistencia;
     alumnoId: string;
 }

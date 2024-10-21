@@ -55,7 +55,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 					</div>
 				</div>
 				<main className="flex-1 overflow-auto p-6">
-					{children}
+					{children} 
 				</main>
 				<div className="flex flex-col mt-auto">
 					<div className="flex flex-row justify-between">

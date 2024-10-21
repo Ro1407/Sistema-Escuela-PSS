@@ -48,6 +48,16 @@ export async function getPadreByDNI(dni: string): Promise<Padre | null> {
     });
 }
 
+export async function getPadreConAlumnos(id: string): Promise<Padre | null> {
+    return prisma.padre.findUnique({
+        where: { id },
+        include: {
+            usuario: true,
+            hijos: true
+        }
+    });
+}
+
 export async function getAllPadres(): Promise<Padre[]> {
     return prisma.padre.findMany({
         include: {
