@@ -1,13 +1,16 @@
 'use client'
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
 
 export default function InfoCurso() {
-  const pathname = usePathname();
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const curso = searchParams.get('curso')
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -16,7 +19,7 @@ export default function InfoCurso() {
       <DropdownMenuContent className="bg-black flex flex-col gap-2">
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/docente/trabajos-practicos"
+            href={`/inicio/docente/trabajos-practicos${curso ? `?curso=${curso}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/docente/trabajos-practicos' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -27,7 +30,7 @@ export default function InfoCurso() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/docente/notas"
+            href={`/inicio/docente/notas${curso ? `?curso=${curso}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/docente/notas' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -38,7 +41,7 @@ export default function InfoCurso() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/docente/asistencias"
+            href={`/inicio/docente/asistencias${curso ? `?curso=${curso}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/docente/asistencias' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -49,7 +52,7 @@ export default function InfoCurso() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/docente/amonestaciones"
+            href={`/inicio/docente/amonestaciones${curso ? `?curso=${curso}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/docente/amonestaciones' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -60,7 +63,7 @@ export default function InfoCurso() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/docente/boletines"
+            href={`/inicio/docente/boletines${curso ? `?curso=${curso}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/docente/boletines' ? 'bg-blue-700 text-white' : 'bg-white'

@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,8 @@ import Link from "next/link";
 
 export default function InfoHijos() {
   const pathname = usePathname();
+  const searchParams = useSearchParams()
+  const hijo = searchParams.get('hijo')
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -16,7 +18,7 @@ export default function InfoHijos() {
       <DropdownMenuContent className="bg-black flex flex-col gap-2">
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/padre/amonestaciones"
+            href={`/inicio/padre/amonestaciones${hijo ? `?hijo=${hijo}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/padre/amonestaciones' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -27,7 +29,7 @@ export default function InfoHijos() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/padre/boletines"
+            href={`/inicio/padre/boletines${hijo ? `?hijo=${hijo}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/padre/boletines' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -38,7 +40,7 @@ export default function InfoHijos() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/padre/notas"
+            href={`/inicio/padre/notas${hijo ? `?hijo=${hijo}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/padre/notas' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -49,7 +51,7 @@ export default function InfoHijos() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href="/inicio/padre/asistencias"
+            href={`/inicio/padre/asistencias${hijo ? `?hijo=${hijo}` : ''}`}
             className={clsx(
               "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
               pathname === '/inicio/padre/asistencias' ? 'bg-blue-700 text-white' : 'bg-white'
@@ -59,7 +61,7 @@ export default function InfoHijos() {
           </Link>
         </DropdownMenuItem >
         <DropdownMenuItem asChild><Link
-          href="/inicio/padre/trabajos-practicos"
+          href={`/inicio/padre/trabajos-practicos${hijo ? `?hijo=${hijo}` : ''}`}
           className={clsx(
             "w-full gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer",
             pathname === '/inicio/padre/trabajos-practicos' ? 'bg-blue-700 text-white' : 'bg-white'
